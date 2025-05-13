@@ -1,0 +1,3480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guokimon Guo!</title>
+    <!-- Google Fonts for Pokémon style -->
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: url('https://img.freepik.com/free-vector/empty-nature-scenery_1308-32078.jpg');
+            background-repeat: no-repeat;
+            background-size: cover; /* Resize the background image to cover the entire container */
+            background-size: cover; /* Resize the background image to cover the entire container */
+
+            text-align: center;
+        }
+        #game-state-bar {
+            pointer-events: none;
+        }
+        #game-state-bar input,
+        #game-state-bar button {
+            pointer-events: auto;
+        }
+        #loading-screen {
+            position: fixed;
+            z-index: 3000;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #87CEEB;
+            background-image: url("https://pm1.aminoapps.com/7064/77c4e4b780755079d2ef8f37e643b74eb8f34ba4r1-800-373v2_hq.jpg"); no repeat
+            background-repeat: no-repeat;
+            background-size: cover; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+        #loading-title {
+            font-size: 3.5rem;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px #FFA500;
+            margin-top: 20px;
+            font-family: 'Press Start 2P', monospace;
+        }
+        #loading-gif {
+            width: 700px;
+            height: auto;
+            margin: 0 auto;
+        }
+        #start-button {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            background: #32CD32;
+            color: #fff;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+        #start-button:hover {
+            transform: scale(1.05);
+            background: #228B22;
+        }
+        #start-button:active {
+            transform: scale(0.95);
+        }
+        .energy-box {
+            display: none; /* Hidden by default */
+            text-align: center;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            z-index: 1000; /* Ensure it appears above other elements */
+            font-size: 1rem;
+            font-weight: bold;
+            padding: 10px;
+            background: #f1f1f1;
+            border-radius: 12px;
+            border: 4px solid;
+        }
+        
+        .energy-box.show {
+            display: block; /* Show when battle starts */
+            transform: scale(0.5); /* Slightly larger for emphasis */
+            opacity: 1;
+        }
+        
+        .energy-box.hidden {
+            display: none;
+            opacity: 0;
+        }
+        
+        /* Add hover effects for aesthetic appeal */
+        .energy-box:hover {
+            transform: scale(0.9);
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
+        }
+        #loading-screen .loading-content {
+            background: rgba(255,255,255,0.85);
+            border-radius: 20px;
+            box-shadow: 0 0 40px #0005;
+            padding: 40px 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .guokimon-title {
+            font-family: 'Luckiest Guy', 'Arial Black', cursive;
+            color: #ef5350;
+            font-size: 4rem;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 12px #3b4cca, 0 0 10px #fff;
+        }
+        #draft-modal .modal-content {
+          max-height: 70vh;     /* or adjust as needed */
+          overflow-y: auto;
+          background-color: #b2f2bb;
+        }
+        .blink-text {
+            font-family: 'Press Start 2P', monospace;
+            color: #3b4cca;
+            font-size: 1.4rem;
+            margin-top: 16px;
+            animation: blink 1s steps(2, start) infinite;
+        }
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+        #juicyjack-modal { display: none; position: fixed; z-index: 5000; left: 0; top: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; }
+        #juicyjack-modal.active { display: flex; }
+        #homepage {
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 1;
+            background: #b1fcb1;
+            padding: 28px 24px 32px 24px;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px #f62681;
+            margin-top: 28px;
+            border: 4px solid #f62681;
+            position: relative;
+            box-shadow: 0 9px 9px 0 rgba #f62681, 0 6px 20px 0 #f62681;
+        }
+        
+        .guo-img-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 0 12px 0;
+        }
+        .guo-img {
+            width: 500px;
+            height: 160px;
+            border-radius: 5%;
+            box-shadow: 0 4px 24px #ffd20080, 0 0 0 6px #42a5f5;
+            background: linear-gradient(145deg, #fff 60%, #ffe0e0 100%);
+            object-fit: cover;
+            border: 2px solid rgba(3, 201, 169);
+            opacity: 0.75;
+            
+        }
+        .mode-btn-row {
+            display: flex;
+            flex-direction: row;
+            gap: 30px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .mode-btn {
+            flex: 1 1 100%;
+            background: linear-gradient(90deg, #65a765 0%, #90ee90 50%, #c8ff98 100%);
+            color: #00770e;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.15rem;
+            border: none;
+            border-radius: 14px;
+            padding: 22px 0;
+            margin: 5 10px;
+            box-shadow: 0 4px 18px #f62681, 0 0 0 4px #fff7, 0 0 0 8px #ffcb0544;
+            cursor: pointer;
+            transition: transform 0.13s, box-shadow 0.13s, background 0.2s;
+            letter-spacing: 1px;
+            width: 300px;
+            height: 200px;
+        }
+        .mode-btn:hover, .mode-btn:focus {
+            background: linear-gradient(90deg, #c8ff98 0%, #90ee90 50%, #65a765 100%);
+            transform: scale(1.08) rotate(-2deg);
+            box-shadow: 0 8px 32px #3b4cca70, 0 0 0 6px #ffcb0599;
+        }
+        #character-info {
+          max-height: 350px;   /* or any height you want */
+          overflow-y: auto;
+          background: #fffde4;
+          border: 2px solid #3b4cca;
+          border-radius: 14px;
+          padding: 18px 20px;
+          margin: 20px auto;
+          text-align: left;
+          font-size: 1em;
+          width: 90%;
+          max-width: 600px;
+          box-shadow: 0 2px 16px #3b4cca22;
+        }
+        #character-info b {
+          color: #3b4cca;
+        }
+        /* Retreat Modal Styles */
+        #pokemon-selection-modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 120%;
+            height: 110%;
+            background-color: rgba(0,0,0,0.7);
+            
+        }
+        
+        #pokemon-selection-container {
+            background: white;
+            margin-top: 100px;
+            margin-bottom: 100px;
+            margin-right: 150px;
+            margin-left: 80px;
+            padding: 20px;
+            width: 120%;
+            max-width: 900px;
+            border-radius: 10px;
+            background-color: #b2f2bb;
+        }
+        
+        .pokemon-card {
+            display: inline-block;
+            width: 150px;
+            margin: 10px;
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .pokemon-card:hover {
+            border-color: #4CAF50;
+            transform: scale(1.05);
+        }
+        
+        .pokemon-card.active {
+            border-color: #f44336;
+            cursor: default;
+        }
+        
+        .health-bar {
+            height: 10px;
+            background-image: linear-gradient(to right, rgba(255,0,0,0), rgba(255,0,0,1));
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+        
+        .health-bar div {
+            height: 100%;
+            background: #4CAF50;
+            border-radius: 5px;
+        }
+        
+        .current-pokemon-header,
+        .available-pokemon-header,
+        .retreated-pokemon-header {
+            font-weight: bold;
+            margin: 15px 0 5px;
+            color: #333;
+        }
+        .pokemon-banner {
+            margin-bottom: 10px;
+            margin-top: 10px;
+            background: linear-gradient(#5edb4a);
+            border-radius: 16px;
+            box-shadow: 0 2px 20px #ffe06655;
+            padding: 8px 0;
+            border: 5px dotted #f62681;
+            background-color: #000;
+            color: #fff;
+            opacity: 0.5;
+        }
+        .pokemon-title {
+            font-family: 'Luckiest Guy', cursive;
+            font-size: 2.3rem;
+            color: #ffef69;
+            margin: 0 18px;
+            letter-spacing: 2px;
+            
+        }
+        .pokemon-banner {
+            width: 100%;
+            max-width: 700px;
+            background: ;
+            margin: 0 auto 24px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+        .pokemon-banner img {
+            height: 60px;
+            margin-right: 12px;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .show {
+            display: flex !important;
+            opacity: 1 !important;
+        }
+        #game-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fffde4;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            display: block;
+            position: relative;
+            overflow-y = auto;
+            background: linear-gradient(135deg, #a8e6cf 0%, #dcedc1 50%, #b2f2bb 100%);
+        }
+        #player-team-box, #opponent-team-box {
+            display: block;
+        }
+        #player-team-box {
+            position: absolute;
+            left: -140px;
+            top: 0;
+            background: #fffde4;
+            border: 2px solid #3b4cca;
+            border-radius: 10px;
+            padding: 8px 10px;
+            min-width: 110px;
+            box-shadow: 0 2px 10px #3b4cca30;
+        }
+        #opponent-team-box {
+            position: absolute;
+            right: -140px;
+            top: 0;
+            background: #fffde4;
+            border: 2px solid #d7263d;
+            border-radius: 10px;
+            padding: 8px 10px;
+            min-width: 110px;
+            box-shadow: 0 2px 10px #d7263d30;
+        }
+        .current-message {
+            padding: 10px 15px;
+            background: rgba(255, 203, 5, 0.2); /* Yellow tint */
+            border-left: 4px solid #ffcb05;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-weight: bold;
+            animation: slideIn 0.2s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(10px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .player, .opponent {
+            display: inline-block;
+            width: 45%;
+            vertical-align: top;
+            position: relative;
+        }
+        .player-avatar, .opponent-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid #3b4cca;
+            margin-bottom: 10px;
+            object-fit: contain;
+        }
+        .health-bar {
+            background: #ddd;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(60,60,60,0.09);
+        }
+        .health-fill {
+            background-image: linear-gradient(to right, rgba(255,0,0,0), rgba(255,0,0,1));
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+        .moves {
+            margin-top: 10px;
+        }
+        #battle-log {
+            max-height: 220px;
+            overflow-y: auto;
+            background: #f9f9f9;
+            padding: 14px;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-align: left;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.97rem;
+            color: #222;
+            scrollbar-width: thin;
+            scrollbar-color: #3b4cca #eee;
+            background-color: #ffc0cb;
+        }
+        
+
+        
+        #battle-log::-webkit-scrollbar {
+            width: 10px;
+        }
+        #battle-log::-webkit-scrollbar-thumb {
+            background: #3b4cca;
+            border-radius: 8px;
+        }
+        #battle-log::-webkit-scrollbar-track {
+            background: #eee;
+            border-radius: 8px;
+        }
+        .log-message {
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+            margin-bottom: 6px;
+        }
+        .log-message.important {
+            color: #d7263d;
+            font-weight: bold;
+            font-size: 1.06em;
+        }
+        .log-message.super {
+            color: #ffb700;
+            font-weight: bold;
+            text-shadow: 1px 1px 0 #3b4cca;
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        #selection-modal, #play-again-modal, #gambling-modal, #vs-cutscene, #coinflip-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            
+        }
+        #how-to-play-tab {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 9999;
+            font-family: inherit;
+        }
+        
+        #how-to-play-toggle {
+            background: #3b4cca;
+            color: #fffde4;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            box-shadow: 0 2px 8px #0002;
+        }
+        
+        #how-to-play-content {
+            display: none;
+            background: #fffde4;
+            border: 2px solid #3b4cca;
+            border-radius: 0 0 12px 12px;
+            padding: 18px 24px 18px 18px;
+            min-width: 260px;
+            max-width: 340px;
+            box-shadow: 0 6px 24px #3b4cca40;
+            position: relative;
+        }
+        
+        #how-to-play-content h2 {
+            margin-top: 0;
+            font-size: 1.2em;
+            color: #3b4cca;
+        }
+        
+        #how-to-play-close {
+            position: absolute;
+            top: 6px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.3em;
+            color: #d7263d;
+            cursor: pointer;
+        }
+             
+        }
+        #how-to-play-content {
+            display: none;
+            position: fixed;
+            left: 0; right: 0; top: 0; bottom: 0;
+            background: #fffde4;
+            z-index: 10000;
+            border-radius: 0;
+            border: none;
+            box-shadow: none;
+            padding: 40px 20px 20px 20px;
+            max-width: none;
+            min-width: 0;
+            max-height: none;      
+            overflow-y: auto;   
+        }
+        
+        .modal-content {
+            background: #fffde4;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            font-family: 'Press Start 2P', monospace;
+            overflow-y = auto;
+        }
+        #gambling-input {
+            padding: 5px;
+            margin: 10px;
+            width: 100px;
+        }
+        #vs-cutscene .vs-bounce {
+            display: inline-block;
+            animation: vsBounceIn 0.7s cubic-bezier(.68,-0.55,.27,1.55);
+        }
+        #vs-cutscene .vs-shake {
+            display: inline-block;
+            animation: vsShake 0.5s cubic-bezier(.36,.07,.19,.97) 0.5s;
+        }
+        @keyframes vsBounceIn {
+            0% { transform: scale(0.2) translateY(-80px); opacity: 0; }
+            60% { transform: scale(1.2) translateY(10px); opacity: 1; }
+            80% { transform: scale(0.95) translateY(-5px); }
+            100% { transform: scale(1) translateY(0); }
+        }
+        @keyframes vsShake {
+            0% { transform: scale(0.9) rotate(0deg); }
+            20% { transform: scale(1.2) rotate(-10deg); }
+            40% { transform: scale(1.2) rotate(10deg); }
+            60% { transform: scale(1.1) rotate(-5deg); }
+            80% { transform: scale(1.1) rotate(5deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        .pokemon-btn {
+            background: linear-gradient(90deg, #ffc0cb 0%, #90ee90 100%); /* light pink to light green */
+            color: #222;
+            font-family: 'Luckiest Guy', cursive;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 16px;
+            padding: 10px 15px;
+            margin: 6px 3px;
+            box-shadow: 0 4px 18px #90ee9040, 0 0 0 4px #fff7;
+            cursor: pointer;
+            transition: transform 0.13s, box-shadow 0.13s, background 0.2s;
+            letter-spacing: 1px;
+            display: inline-block;
+        }
+        
+        .pokemon-btn:hover, .pokemon-btn:focus {
+            background: linear-gradient(90deg, #90ee90 0%, #ffc0cb 100%); /* reversed on hover */
+            color: #fff;
+            transform: scale(1.10) rotate(-2deg);
+            box-shadow: 0 8px 32px #ffc0cb70, 0 0 0 6px #90ee9099;
+        }
+        .modal-btn {
+            background: linear-gradient(90deg, #42a5f5 0%, #ffe066 100%);
+            color: #222;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1rem;
+            border-radius: 10px;
+            border: none;
+            padding: 14px 18px;
+            margin: 5px 5px;
+            box-shadow: 0 2px 8px #ffd20040;
+            cursor: pointer;
+            transition: transform 0.12s, box-shadow 0.12s, background 0.2s;
+        }
+        .modal-btn:hover, .modal-btn:focus {
+            background: linear-gradient(90deg, #ffe066 0%, #42a5f5 100%);
+            color: #3b4cca;
+            transform: scale(1.08);
+            box-shadow: 0 6px 24px #42a5f560;
+        }
+        #triple-btn, #pvp-btn, #cpu-btn{
+          width: 300px;
+          height: 100px;
+          font-size: 1rem;
+          color: #f62681;
+          
+          text-shadow: 2px 2px 4px #FFA500;
+          margin-top: 20px;
+          font-family: 'Press Start 2P', monospace;
+        }
+        .move-btn {
+            background: linear-gradient(90deg, #ef5350 0%, #fff 50%, #3b4cca 100%) !important;
+            color: #222 !important;
+            font-family: 'Press Start 2P', monospace !important;
+            font-size: 1.15rem !important;
+            border: none !important;
+            border-radius: 14px !important;
+            padding: 5px 10px !important;
+            margin: 5px 4px !important;
+            box-shadow: 0 4px 18px #3b4cca40, 0 0 0 4px #fff7, 0 0 0 8px #ef535044 !important;
+            cursor: pointer !important;
+            transition: transform 0.13s, box-shadow 0.13s, background 0.2s !important;
+            letter-spacing: 1px !important;
+            display: inline-block !important;
+        }
+        .move-btn:disabled {
+            background: #ccc;
+            color: #666;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        .move-btn span {
+            font-size: 0.8rem; /* Smaller font size for energy display */
+            margin-left: 5px; /* Adjust spacing between move name and energy */
+            color: #ffcb05; /* Color for the energy display */
+        }
+        .move-btn:hover, .move-btn:focus {
+            background: linear-gradient(90deg, #3b4cca 0%, #fff 50%, #ef5350 100%) !important;
+            color: #fff !important;
+            transform: scale(1.08) rotate(-2deg) !important;
+            box-shadow: 0 8px 32px #3b4cca70, 0 0 0 6px #ef535099 !important;
+        }
+        @keyframes pop-bounce {
+          0% { transform: scale(0.7); opacity: 0; }
+          60% { transform: scale(1.15); opacity: 1; }
+          100% { transform: scale(1); }
+        }
+        #who-goes-first-content {
+          animation: pop-bounce 0.7s cubic-bezier(.36,1.56,.64,1) both;
+        }
+    </style>
+</head>
+<body>
+
+        <!-- Loading Screen Overlay -->
+    <div id="loading-screen">
+        <h1 id="loading-title">GUOKIMON YAY!</h1>
+        <button id="start-button">Click to Start</button>
+        <img id="loading-gif" src="5c32670ac7a737973c25d203c74c3911-ezgif.com-gif-maker.gif" alt="Loading Animation">
+        
+    </div>
+
+        <!-- HOW TO PLAY TAB -->
+    <div id="how-to-play-tab">
+        <button id="how-to-play-toggle">How to Play</button>
+        <div id="how-to-play-content">
+            <button id="how-to-play-close">&times;</button>
+            <h2>How to Play</h2>
+            <div id="character-info">
+              <b>Guokiman</b><br>
+              HP: 180 | Speed: 305 | Evolution Level: 140 <br>
+              A powerful fighter with explosive moves.<br>
+              <b>Moves:</b> Guo Blast (50), Guo Explosion (75, 30 self-damage), Potion (+25)
+              <br><br>
+            
+              <b>Pikachu</b><br>
+              HP: 140 | Speed: 500 | Evolution Level: 140 <br>
+              A fast electric Pokémon with a risky attack.<br>
+              <b>Ability:</b> Pika Bolt has a 50% chance to deal 30 self-damage (Repulsion).<br>
+              <b>Moves:</b> Pika Bolt (70), Potion (+25)
+              <br><br>
+            
+              <b>Laurune</b><br>
+              HP: 130 | Speed: 365 | Evolution Level: 130 <br>
+              A strategic Pokémon with a paralyzing quiz move.<br>
+              <b>Ability:</b> Laurune Handout deals 50 extra damage to MicaManx.<br>
+              <b>Moves:</b> Laurune Handout (60), Potion (+25), Kuhn Quiz (Paralyze + 30)
+              <br><br>
+            
+              <b>MicaManx</b><br>
+              HP: 150 | Speed: 200 | Evolution Level: 200 <br>
+              A risky fighter with a volatile ability.<br>
+              <b>Ability:</b> 50% chance to lose 20 HP each turn; if not, Micah Slash deals 50 extra damage. Deals 30 less damage to Laurune.<br>
+              <b>Moves:</b> Micah Slash (50), Potion (+25)
+              <br><br>
+            
+              <b>Akhilan</b><br>
+              HP: 75 | Speed: 1000 | Evolution Level: 3 (Evolution Points) <br>
+              A fast Pokémon that evolves into AkhilApe after 3 evolution points.<br>
+              <b>Ability:</b> Gains 1 evolution point each turn.<br>
+              <b>Moves:</b> Curry Splash (50), Potion (+25), Gain Evolution Point
+              <br><br>
+            
+              <b>AkhilApe (Evolved Akhilan)</b><br>
+              HP: 130 | Speed: 1000 <br>
+              The evolved form of Akhilan with a powerful dance move.<br>
+              <b>Moves:</b> Curry Dance (100), Potion (+25)
+              <br><br>
+            
+              <b>Samulet</b><br>
+              HP: 145 | Speed: 954 | Evolution Level: 145 <br>
+              A high-risk, high-reward Pokémon with a gamble move.<br>
+              <b>Moves:</b> Sammify (0 or 100), Potion (+25)
+              <br><br>
+            
+              <b>BriceRaptor</b><br>
+              HP: 140 | Speed: 200 | Evolution Level: 140 <br>
+              A sturdy fighter with a conditional boost.<br>
+              <b>Ability:</b> RiceSlash deals 50 extra damage if HP is 70 or below.<br>
+              <b>Moves:</b> RiceSlash (50), Potion (+25)
+              <br><br>
+            
+              <b>Tag Team Jillian and Maya</b><br>
+              HP: 75 (each) | Speed: 499 | Evolution Level: 75 <br>
+              A duo that switches fighters upon fainting.<br>
+              <b>Ability:</b> Starts as Maya; if Maya faints, Jillian takes over with full HP.<br>
+              <b>Maya:</b> HP: 75 | Speed: 499 | Evolution Level: 100<br>
+              <b>Moves:</b> Matza (50), Potion (+25)<br>
+              <b>Jillian:</b> HP: 75 | Speed: 499 | Evolution Level: 75<br>
+              <b>Moves:</b> Latka (100), Potion (+25)
+              <br><br>
+            
+              <b>Jack-Attack</b><br>
+              HP: 180 | Speed: 900 | Evolution Level: 180 <br>
+              A strong fighter with increasing attack power.<br>
+              <b>Ability:</b> Jack-Punch increases attack by 25% each use.<br>
+              <b>Moves:</b> Jack-Punch (50), Potion (+25)
+              <br><br>
+            
+              <b>ReidRice</b><br>
+              HP: 130 | Speed: 201 | Evolution Level: 130 <br>
+              A gambler with a high-risk move.<br>
+              <b>Moves:</b> Gambling, Potion (+25)
+              <br><br>
+            
+              <b>WilliBily</b><br>
+              HP: 140 | Speed: 333 | Evolution Level: 140 <br>
+              A sigma boy with chaotic meme energy.<br>
+              <b>Moves:</b> ADHD (40), Potion (+25), Meme Beam (30, 50% Paralyze)
+              <br><br>
+            
+              <b>Bananini</b><br>
+              HP: 160 | Speed: 500 | Evolution Level: 140 <br>
+              An Italian brainrot schimpanizini with banana-based moves.<br>
+              <b>Ability:</b> Eat Bananini gains banana points, increasing Monke Stare's damage. Has a 1-turn cooldown after eating.<br>
+              <b>Moves:</b> Eat Bananini, Potion (+25), Monke Stare
+              <br><br>
+            
+              <b>Moves</b><br>
+              <b>Guo Blast (50):</b> Deals 50 damage to the opponent.<br>
+              <b>Guo Explosion (75, 30 self-damage):</b> Deals 75 damage to the opponent but 30 damage to self.<br>
+              <b>Pika Bolt (70):</b> Deals 70 damage, but has a 50% chance to deal 30 self-damage (Repulsion).<br>
+              <b>Laurune Handout (60):</b> Deals 60 damage. Deals 50 extra damage to MicaManx.<br>
+              <b>Kuhn Quiz (Paralyze + 30):</b> Deals 15 damage and paralyzes the opponent (can only be used once per battle).<br>
+              <b>Micah Slash (50):</b> Deals 50 damage. Deals 30 less damage to Laurune. If MicaManx's ability activates, deals 50 extra damage.<br>
+              <b>Curry Splash (50):</b> Deals 50 damage.<br>
+              <b>Gain Evolution Point:</b> Adds 1 evolution point to Akhilan (evolves into AkhilApe at 3 points).<br>
+              <b>Curry Dance (100):</b> Deals 100 damage (AkhilApe only).<br>
+              <b>Sammify (0 or 100):</b> 50% chance to deal 100 damage, 50% chance to deal 0 damage.<br>
+              <b>RiceSlash (50):</b> Deals 50 damage. Deals 50 extra damage if BriceRaptor's HP is 70 or below.<br>
+              <b>Matza (50):</b> Deals 50 damage (Maya only).<br>
+              <b>Latka (100):</b> Deals 100 damage (Jillian only).<br>
+              <b>Jack-Punch (50):</b> Deals 50 damage (increases by 25% each use).<br>
+              <b>Gambling:</b> Pick a number from 1 to 10. A random number is generated: Exact match: 200 damage; Distance ≤ 1: 80 damage; Distance ≤ 2: 50 damage; Distance ≤ 5: 20 damage; Otherwise: 0 damage.<br>
+              <b>ADHD (40):</b> Deals 40 damage (WilliBily only).<br>
+              <b>Meme Beam (30, 50% Paralyze):</b> Deals 30 damage with a 50% chance to paralyze the opponent (WilliBily only).<br>
+              <b>Eat Bananini:</b> Gains 1 banana point and heals 5 HP per banana point. Sets opponent's HP to Bananini's current HP. Has a 1-turn cooldown (Bananini only).<br>
+              <b>Monke Stare:</b> Deals 25 damage multiplied by the number of banana points (Bananini only).<br>
+              <b>Potion (+25):</b> Heals 25 HP (cannot exceed max HP).
+            </div>
+        </div>
+    </div>
+
+    <!-- Coin Flip Modal (simple GIF version) -->
+    <div id="coinflip-modal" class="hidden" style="position:fixed;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);z-index:9999;">
+      <div style="background:#fff;padding:30px 40px;border-radius:20px;text-align:center;box-shadow:0 2px 16px rgba(0,0,0,0.25);">
+        <img id="coinflip-gif" src="" alt="Coin Flip" style="width:120px;height:120px;">
+        <div id="coinflip-result" style="font-size:1.5em;margin-top:10px;"></div>
+      </div>
+    </div>
+    <!-- Energy Display Boxes (Hidden by Default) -->
+    <div id="player-energy-box" class="energy-box hidden" style="position: absolute; left: 10px; bottom: 100px; background: #f1f1f1; border: 4px solid #3b4cca; padding: 20px; border-radius: 15px; font-size: 1.5rem; font-weight: bold;">
+        Player Energy: <span id="player-energy">0</span> ⚡
+    </div>
+    <div id="opponent-energy-box" class="energy-box hidden" style="position: absolute; right: 10px; bottom: 100px; background: #f1f1f1; border: 4px solid #d7263d; padding: 20px; border-radius: 15px; font-size: 1.5rem; font-weight: bold;">
+        Opponent Energy: <span id="opponent-energy">0</span> ⚡
+    </div>
+
+    <!-- Event Toast Popup -->
+    <div id="event-toast" style="display:none;position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:16px 32px;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,0.15);font-size:1.2em;z-index:9999;pointer-events:none;opacity:0;transition:opacity 0.4s;">
+      <span id="event-toast-msg"></span>
+    </div>
+    <!-- Developer Modal Button (top right corner, bland) -->
+    <button id="dev-modal-btn" style="position:fixed; top:18px; right:18px; z-index:9999; background:#eee; color:#222; border:1px solid #ccc; border-radius:6px; padding:7px 14px; font-size:1em; cursor:pointer;">Developer Modal</button>
+    
+    <!-- Developer Modal -->
+    <div id="dev-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.45); z-index:10000; align-items:center; justify-content:center;">
+      <div style="background:#fff; border-radius:12px; box-shadow:0 2px 16px #0002; padding:34px 24px 24px 24px; min-width:260px; min-height:120px; position:relative; text-align:center;">
+        <button id="dev-modal-close" style="position:absolute; top:8px; right:10px; background:none; border:none; font-size:1.3em; color:#888; cursor:pointer;">&times;</button>
+        <h3 style="margin-bottom:18px; color:#3b4cca;">Enter Developer Code</h3>
+        <input type="password" id="dev-code-input" placeholder="Enter code..." style="padding:7px 10px; font-size:1em; border-radius:6px; border:1px solid #bbb; margin-bottom:10px;">
+        <br>
+        <button id="dev-code-submit" style="margin-top:10px; padding:7px 18px; border-radius:6px; background:#3b4cca; color:#fff; border:none; cursor:pointer;">Submit</button>
+        <div id="dev-modal-result" style="margin-top:15px; color:#3b4cca; font-weight:bold;"></div>
+      </div>
+    </div>
+
+    <div class="pokemon-banner">
+        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" alt="Pokéball">
+        <span class="pokemon-title">Guokimon Yay!</span>
+        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png" alt="Masterball">
+    </div>
+    <!-- SkibidiMath Modal -->
+    <div id="skibidi-math-modal" class="hidden" style="position:fixed;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.82);z-index:5000;">
+      <div style="background:#fffde4;padding:30px 40px;border-radius:20px;text-align:center;min-width:320px;box-shadow:0 2px 32px #3b4cca80;">
+        <div id="skibidi-math-countdown" style="font-size:2.5rem;margin-bottom:14px;"></div>
+        <div id="skibidi-math-question" style="font-size:1.6rem;margin-bottom:10px;"></div>
+        <input id="skibidi-math-answer" type="number" style="font-size:1.2rem;padding:6px 10px;border-radius:6px;border:1px solid #bbb;width:90px;" autocomplete="off">
+        <button id="skibidi-math-submit" style="font-size:1.1rem;margin-left:10px;padding:6px 16px;border-radius:6px;background:#3b4cca;color:#fff;border:none;cursor:pointer;">Submit</button>
+        <div id="skibidi-math-timer" style="margin-top:10px;font-size:1.1rem;"></div>
+        <div id="skibidi-math-result" style="margin-top:12px;font-size:1.2rem;color:#3b4cca;"></div>
+      </div>
+    </div>
+    <div id="homepage">
+      <h2 style="font-family: 'Luckiest Guy', 'Arial Black', cursive; color: #3b4cca; font-size: 1rem; margin-bottom: 8px;">Made by Atharva</h2>
+        <p style="font-family: 'Press Start 2P', monospace; color: #555; font-size: 1.1rem;">Choose your battle mode and unleash your Pokémon!</p>
+        <div class="guo-img-wrap">
+            <img src="https://i.imgur.com/2lhEKQ1.gif" alt="Guo" class="guo-img">
+        </div>
+        <div class="mode-btn-row">
+            <button id="pvp-btn" class="mode-btn"><span class="icon">⚔️</span> Player vs Player</button>
+            <button id="cpu-btn" class="mode-btn"><span class="icon">🤖</span> Player vs CPU</button>
+            <button id="triple-btn" class="mode-btn"><span class="icon">🔥</span> 3v3 PvP Draft</button>
+        </div>
+    </div>
+    <div id="game-container" class="hidden">
+        <div id="player-team-box" style="position:absolute;left:-140px;top:0;background:#fffde4;border:2px solid #3b4cca;border-radius:10px;padding:8px 10px;min-width:110px;box-shadow:0 2px 10px #3b4cca30;"></div>
+        <div class="player" style="position:relative;">
+            <img id="player-avatar" class="player-avatar" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" alt="Player Pokémon">
+            <div id="player-name" style="font-family: 'Luckiest Guy', cursive; font-size: 1.4rem; color: #3b4cca;"></div>
+            <div>HP: <span id="player-hp">0/0</span></div>
+            <div class="health-bar"><div class="health-fill" id="player-health-bar" style="width: 100%"></div></div>
+            <div class="moves" id="moves"></div>
+        </div>
+        <div class="opponent" style="position:relative;">
+            <img id="opponent-avatar" class="opponent-avatar" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png" alt="Opponent Pokémon">
+            <div id="opponent-name" style="font-family: 'Luckiest Guy', cursive; font-size: 1.4rem; color: #d7263d;"></div>
+            <div>HP: <span id="opponent-hp">0/0</span></div>
+            <div class="health-bar"><div class="health-fill" id="opponent-health-bar" style="width: 100%"></div></div>
+            <div class="moves" id="opponent-moves"></div>
+        </div>
+        <div id="opponent-team-box" style="position:absolute;right:-140px;top:0;background:#fffde4;border:2px solid #d7263d;border-radius:10px;padding:8px 10px;min-width:110px;box-shadow:0 2px 10px #d7263d30;"></div>
+        <div id="battle-log"></div>
+    </div>
+    <div id="selection-modal" class="hidden">
+        <div class="modal-content">
+            <h2 id="selection-title">Choose Your Pokémon</h2>
+            <div id="pokemon-list"></div>
+            <button id="selection-cancel" class="modal-btn" style="margin-top:18px;">Cancel</button>
+        </div>
+    </div>
+    <div id="play-again-modal" class="hidden">
+        <div class="modal-content">
+            <h2 id="play-again-message">Game Over!</h2>
+            <p>Play again?</p>
+            <button class="modal-btn" id="play-again-yes">Yes</button>
+            <button class="modal-btn" id="play-again-no">No</button>
+        </div>
+    </div>
+    <!-- JUICYJACK CPS MINI-GAME MODAL -->
+    <div id="juicyjack-modal" style="display:none; position:fixed; z-index:5000; left:0; top:0; right:0; bottom:0; background:rgba(0,0,0,0.7); align-items:center; justify-content:center;">
+      <div style="background:#fffde4; border-radius:16px; box-shadow:0 2px 32px #3b4cca80; padding:36px 32px; min-width:280px; text-align:center; position:relative;">
+        <span id="juicyjack-countdown" style="font-size:1.5em; color:#3b4cca; display:block; margin-bottom:10px;"></span>
+        <button id="juicyjack-click-btn" style="display:none; font-size:1.3em; padding:18px 36px; background:#3b4cca; color:#fffde4; border:none; border-radius:12px; cursor:pointer;">TAP!</button>
+        <div id="juicyjack-result" style="margin-top:20px; font-size:1.2em; color:#3b4cca;"></div>
+      </div>
+    </div>
+    <div id="gambling-modal" class="hidden">
+        <div class="modal-content">
+            <h2 id="gambling-title">Gambling Move</h2>
+            <p>Pick a number from 1 to 10 for <span id="gambling-player"></span>:</p>
+            <input type="number" id="gambling-input" min="1" max="10">
+            <button class="modal-btn" id="gambling-submit">Submit</button>
+        </div>
+    </div>
+    <div id="vs-cutscene" class="modal hidden" style="z-index: 2000; text-align: center;">
+        <div style="font-size: 2.5em; font-family: 'Luckiest Guy', cursive; color: #fff; margin-top: 15vh; letter-spacing: 2px; text-shadow: 2px 2px 8px #000;">
+            <span id="vs-left" class="vs-bounce" style="color: #ffce4b;">___</span>
+            <span id="vs-vs" class="vs-shake" style="color: #ef5350; font-size: 1.2em;">VS</span>
+            <span id="vs-right" class="vs-bounce" style="color: #42a5f5;">___</span>
+        </div>
+    </div>
+    <!-- Who Goes First Modal -->
+    <div id="who-goes-first-modal" class="hidden" style="position:fixed;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.8);z-index:3001;">
+      <div id="who-goes-first-content" style="background:#fff;padding:42px 60px;border-radius:28px;text-align:center;box-shadow:0 2px 32px #3b4cca80;">
+        <span id="who-goes-first-text" style="font-family:'Luckiest Guy',cursive;font-size:3rem;color:#ef5350;text-shadow:3px 3px 16px #3b4cca,0 0 16px #fff;">Player 1 Goes First!</span>
+      </div>
+    </div>
+    <div id="pokemon-selection-modal" class="modal">
+        <div id="pokemon-selection-container">
+            <!-- Content will be generated dynamically -->
+        </div>
+    </div>
+    <!-- MEME MODAL -->
+    <div id="meme-modal" class="hidden" style="position:fixed;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.82);z-index:4000;">
+      <img id="meme-img" src="https://media.makeameme.org/created/what-da-hail-5f939d0360.jpg" alt="Meme Beam" style="max-width:90vw;max-height:80vh;border-radius:22px;box-shadow:0 2px 32px #3b4cca80;">
+    </div>
+    <div id="draft-modal" class="hidden" style="position:fixed;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.82);z-index:4001;">
+      <div class="modal-content" style="max-width:500px;text-align:center;">
+        <h2 id="draft-title">3v3 Draft: <span id="draft-turn"></span></h2>
+        <div id="draft-pool"></div>
+        <div id="draft-teams" style="margin-top:18px;"></div>
+        <button id="draft-cancel" class="modal-btn" style="margin-top:18px;">Cancel</button>
+      </div>
+    </div>
+    <script>
+// --- POKÉMON BATTLE GAME LOGIC ---
+console.log('Pokémon Battle Game script loaded!');
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById('how-to-play-toggle').onclick = function() {
+        document.getElementById('how-to-play-content').style.display = 'block';
+    };
+    document.getElementById('how-to-play-close').onclick = function() {
+        document.getElementById('how-to-play-content').style.display = 'none';
+    };
+    // CPS mini-game for JuicyJack
+    function startJuicyJackCPS(onComplete) {
+        const modal = document.getElementById('juicyjack-modal');
+        const countdown = document.getElementById('juicyjack-countdown');
+        const clickBtn = document.getElementById('juicyjack-click-btn');
+        const result = document.getElementById('juicyjack-result');
+        let clicks = 0;
+        let timer = null;
+    
+        // Reset UI
+        countdown.textContent = "Get Ready...";
+        clickBtn.style.display = 'none';
+        result.textContent = '';
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+    
+        // 3 second countdown
+        let count = 3;
+        const countdownInterval = setInterval(() => {
+            countdown.textContent = count > 0 ? `Starting in ${count}...` : "GO!";
+            count--;
+            if (count < 0) {
+                clearInterval(countdownInterval);
+                // Start the CPS test
+                clicks = 0;
+                clickBtn.textContent = "CLICK!";
+                clickBtn.disabled = false;
+                clickBtn.style.display = 'inline-block';
+                countdown.textContent = "Click as fast as you can!";
+                result.textContent = '';
+                // Count clicks for 5 seconds
+                clickBtn.onclick = () => { clicks++; };
+                timer = setTimeout(() => {
+                    clickBtn.disabled = true;
+                    clickBtn.style.display = 'none';
+                    countdown.textContent = "Done!";
+                    result.textContent = `You clicked ${clicks} times!JuicyJack deals${clicks * 2} damage!`;
+                    setTimeout(() => {
+                        modal.classList.remove('active');
+                        modal.style.display = 'none';
+                        if (typeof onComplete === "function") onComplete(clicks * 2);
+                    }, 2000);
+                }, 5000);
+            }
+        }, 1000);
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        const skibidiInput = document.getElementById('skibidi-input');
+        const skibidiSubmit = document.getElementById('skibidi-submit');
+        
+        if (skibidiInput && skibidiSubmit) {
+            skibidiInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    skibidiSubmit.click();
+                }
+            });
+        }
+    });
+    function startSkibidiMath(onComplete) {
+        const modal = document.getElementById('skibidi-math-modal');
+        const countdownEl = document.getElementById('skibidi-math-countdown');
+        const questionEl = document.getElementById('skibidi-math-question');
+        const answerEl = document.getElementById('skibidi-math-answer');
+        const submitBtn = document.getElementById('skibidi-math-submit');
+        const timerEl = document.getElementById('skibidi-math-timer');
+        const resultEl = document.getElementById('skibidi-math-result');
+        let correct = 0, total = 0, timeLeft = 10, currentAnswer = 0, timer, running = false;
+    
+        function generateQuestion() {
+            // Easy addition/subtraction (1-20)
+            const a = Math.floor(Math.random() * 20) + 1;
+            const b = Math.floor(Math.random() * 20) + 1;
+            if (Math.random() < 0.5) {
+                questionEl.textContent = `${a} + ${b} = ?`;
+                currentAnswer = a + b;
+            } else {
+                const max = Math.max(a, b), min = Math.min(a, b);
+                questionEl.textContent = `${max} - ${min} = ?`;
+                currentAnswer = max - min;
+            }
+            answerEl.value = "";
+            answerEl.focus();
+        }
+    
+        function endGame() {
+            running = false;
+            clearInterval(timer);
+            questionEl.style.display = 'none';
+            answerEl.style.display = 'none';
+            submitBtn.style.display = 'none';
+            timerEl.style.display = 'none';
+            resultEl.textContent = `You got ${correct} right!`;
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                questionEl.style.display = '';
+                answerEl.style.display = '';
+                submitBtn.style.display = '';
+                timerEl.style.display = '';
+                resultEl.textContent = '';
+                onComplete(correct);
+            }, 1200);
+        }
+    
+        function handleSubmit() {
+            if (!running) return;
+            const val = parseInt(answerEl.value, 10);
+            if (!isNaN(val) && val === currentAnswer) {
+                correct++;
+            }
+            total++;
+            generateQuestion();
+        }
+    
+        submitBtn.onclick = handleSubmit;
+        answerEl.onkeydown = (e) => { if (e.key === "Enter") handleSubmit(); };
+    
+        // Countdown before start
+        modal.classList.remove('hidden');
+        countdownEl.textContent = '3';
+        questionEl.style.display = 'none';
+        answerEl.style.display = 'none';
+        submitBtn.style.display = 'none';
+        timerEl.style.display = 'none';
+        resultEl.textContent = '';
+        let cd = 3;
+        const cdTimer = setInterval(() => {
+            cd--;
+            if (cd > 0) {
+                countdownEl.textContent = cd;
+            } else {
+                clearInterval(cdTimer);
+                countdownEl.textContent = '';
+                questionEl.style.display = '';
+                answerEl.style.display = '';
+                submitBtn.style.display = '';
+                timerEl.style.display = '';
+                running = true;
+                generateQuestion();
+                timerEl.textContent = `Time left: ${timeLeft}s`;
+                timer = setInterval(() => {
+                    timeLeft--;
+                    timerEl.textContent = `Time left: ${timeLeft}s`;
+                    if (timeLeft <= 0) endGame();
+                }, 1000);
+            }
+        }, 1000);
+    }
+    function createPokemonCard(pokemon, isDraftMode) {
+        const card = document.createElement('div');
+        card.className = 'pokemon-card';
+        
+        // If in draft mode, use the Pokémon name directly
+        // Otherwise, use the name from the Pokémon object
+        const pokemonName = isDraftMode ? pokemon : pokemon.name;
+        
+        card.innerHTML = `
+            <div class="pokemon-avatar">
+                <img src="${POKEMON_ICONS[pokemonName]}" alt="${pokemonName}">
+            </div>
+            <div class="pokemon-info">
+                <h3>${pokemonName}</h3>
+                <div class="pokemon-stats">
+                    <span>HP: ${isDraftMode ? MAX_HEALTH[pokemonName] : pokemon.health}</span>
+                    <span>Energy: ${isDraftMode ? 0 : pokemon.energy}</span>
+                </div>
+            </div>
+        `;
+        
+        // Add click handler
+        card.onclick = () => {
+            if (isDraftMode) {
+                // In draft mode, we need to check the draft pool
+                if (gameState.draftPool.includes(pokemonName)) {
+                    return;
+                }
+                
+                // Add to team and update UI
+                if (gameState.draftingPlayer === 'player') {
+                    gameState.teams.Player1.push(pokemonName);
+                } else {
+                    gameState.teams.Player2.push(pokemonName);
+                }
+                updateDraftUI();
+            } else {
+                // In retreat modal, handle switching Pokémon
+                logMessage(`✅ Selected ${pokemonName} for switch!`);
+                switchPokemon(pokemon.id);
+                document.getElementById("pokemon-selection-modal").style.display = "none";
+            }
+        };
+        
+        return card;
+    }
+
+    function updateDraftUI() {
+        // Update team displays
+        document.getElementById('draft-teams').innerHTML = `
+            <div style="color: #3b4cca;">
+                <b>Player 1:</b> ${teams.Player1.join(', ')}
+            </div>
+            <div style="color: #d7263d;">
+                <b>Player 2:</b> ${teams.Player2.join(', ')}
+            </div>
+        `;
+        
+        // Update available Pokémon buttons
+        const poolDiv = document.getElementById('draft-pool');
+        poolDiv.innerHTML = '';
+        
+        // Create buttons for available Pokémon
+        availablePokemons.forEach(pokemon => {
+            if (!teams.Player1.includes(pokemon) && !teams.Player2.includes(pokemon)) {
+                const btn = document.createElement('button');
+                btn.className = 'draft-button';
+                btn.textContent = pokemon;
+                btn.onclick = () => {
+                    // Add to team based on whose turn it is
+                    const currentTeam = gameState.draftTurn === 'player' ? teams.Player1 : teams.Player2;
+                    currentTeam.push(pokemon);
+                    
+                    // Switch turns
+                    gameState.draftTurn = gameState.draftTurn === 'player' ? 'opponent' : 'player';
+                    
+                    updateDraftUI();
+                    
+                    // Check if both teams have 3 Pokémon
+                    if (teams.Player1.length === 3 && teams.Player2.length === 3) {
+                        setTimeout(() => {
+                            document.getElementById('draft-modal').classList.add('hidden');
+                            start3v3Battle(teams);
+                        }, 500);
+                    }
+                };
+                poolDiv.appendChild(btn);
+            }
+        });
+    }
+    function createPokemonCard(pokemon, team) {
+        const card = document.createElement('div');
+        card.className = 'pokemon-card';
+        
+        // Create the card content
+        card.innerHTML = `
+            <div class="pokemon-info">
+                <h3>${pokemon}</h3>
+                <div class="pokemon-stats">
+                    <div>HP: ${MAX_HEALTH[pokemon]}</div>
+                    <div>Speed: ${SPEED[pokemon]}</div>
+                </div>
+            </div>
+        `;
+        
+        // Add click handler
+        card.onclick = () => {
+            // Check if Pokémon is already in team
+            if (team.includes(pokemon)) {
+                return;
+            }
+            
+            // Add to team and update UI
+            team.push(pokemon);
+            updateDraftUI();
+            
+            // Check if both teams have 3 Pokémon
+            if (teams.Player1.length === 3 && teams.Player2.length === 3) {
+                setTimeout(() => {
+                    document.getElementById('draft-modal').classList.add('hidden');
+                    start3v3Battle(teams);
+                }, 500);
+            }
+        };
+        
+        return card;
+    }
+    // Developer Modal Logic
+    // Updated handleRetreat function for 3
+    
+    // Updated handleRetreat function for 3v3
+    function handleRetreat() {
+          logMessage("1️⃣ Starting retreat process...");
+  
+          if (gameState.mode !== "3v3") {
+              logMessage("❌ Can't retreat - not in 3v3 mode");
+              return;
+          }
+  
+          // Save all data of current Pokémon
+          const currentPokemon = {
+              ...gameState.player.currentPokemon,
+              energy: gameState.player.energy
+          };
+  
+          if (!gameState.player.retreatedPokemon) {
+              logMessage("3️⃣ Creating retreated Pokémon list");
+              gameState.player.retreatedPokemon = [];
+          }
+  
+          logMessage(`4️⃣ Adding ${currentPokemon.name} to retreated list`);
+          gameState.player.retreatedPokemon.push(currentPokemon);
+  
+          logMessage("5️⃣ Opening retreat menu");
+          show3v3RetreatModal();
+      }
+  
+      function show3v3RetreatModal() {
+          logMessage("6️⃣ Preparing retreat menu...");
+  
+          const modal = document.getElementById("pokemon-selection-modal");
+          if (!modal) {
+              logMessage("❌ CRITICAL: Retreat modal not found in HTML");
+              return;
+          }
+  
+          const container = document.getElementById("pokemon-selection-container");
+          if (!container) {
+              logMessage("❌ CRITICAL: Modal container not found");
+              return;
+          }
+  
+          logMessage("7️⃣ Clearing previous menu items");
+          container.innerHTML = '';
+  
+          // Add active Pokémon header
+          const activeHeader = document.createElement("h2");
+          activeHeader.textContent = "Currently Active:";
+          container.appendChild(activeHeader);
+  
+          // Show current Pokémon
+          const activeCard = createPokemonCard(gameState.player.currentPokemon, true);
+          container.appendChild(activeCard);
+  
+          // Add available Pokémon
+          const availableHeader = document.createElement("h2");
+          availableHeader.textContent = "Switch to:";
+          container.appendChild(availableHeader);
+  
+          // Only show the two other Pokémon in the team (not current)
+          const team = gameState.player.draftedTeam.filter(
+              p => p.id !== gameState.player.currentPokemon.id && p.health > 0
+          ).slice(0, 2);
+  
+          if (team.length === 0) {
+              const noOptions = document.createElement("p");
+              noOptions.textContent = "No Pokémon available to switch to!";
+              container.appendChild(noOptions);
+              return;
+          }
+  
+          team.forEach(pokemon => {
+              const card = createPokemonCard(pokemon, false);
+              card.addEventListener('click', () => {
+                  logMessage(`✅ Selected ${pokemon.name} for switch!`);
+                  switchPokemon(pokemon.id);
+                  modal.style.display = "none";
+              });
+              container.appendChild(card);
+          });
+  
+          logMessage("8️⃣ Displaying retreat menu");
+          modal.style.display = "block";
+      }
+  
+      function switchPokemon(pokemonId) {
+          logMessage(`9️⃣ Switching to Pokémon ID: ${pokemonId}`);
+  
+          // Find the Pokémon in the drafted team
+          const newPokemon = gameState.player.draftedTeam.find(p => p.id === pokemonId);
+  
+          if (!newPokemon) {
+              logMessage("❌ Failed to find Pokémon to switch to");
+              return;
+          }
+  
+          logMessage(`🔄 Switching to ${newPokemon.name}`);
+          gameState.player.currentPokemon = { ...newPokemon };
+          gameState.player.energy = newPokemon.energy || 0;
+  
+          updateBattleUI();
+          logMessage(`✅ Switched to ${newPokemon.name}!`);
+      }
+      
+      
+  document.getElementById('dev-modal-btn').onclick = function() {
+      document.getElementById('dev-modal').style.display = 'flex';
+      document.getElementById('dev-code-input').value = '';
+      document.getElementById('dev-modal-result').textContent = '';
+      document.getElementById('dev-code-input').focus();
+  };
+  document.getElementById('dev-modal-close').onclick = function() {
+      document.getElementById('dev-modal').style.display = 'none';
+  };
+  document.getElementById('dev-code-submit').onclick = function() {
+      const code = document.getElementById('dev-code-input').value;
+      const result = document.getElementById('dev-modal-result');
+      if (code === 'Password123') {
+          result.textContent = 'right password';
+          result.style.color = '#228B22';
+      } else {
+          result.textContent = 'wrong password';
+          result.style.color = '#d7263d';
+      }
+  };
+  function updateEnergyDisplay() {
+      // Update energy values for both players
+      document.getElementById("player-energy").textContent = gameState.player.energy;
+      document.getElementById("opponent-energy").textContent = gameState.opponent.energy;
+  
+      // Show or hide the energy boxes based on the game state
+      const playerEnergyBox = document.getElementById("player-energy-box");
+      const opponentEnergyBox = document.getElementById("opponent-energy-box");
+  
+      if (gameState.mode === "pvp" || gameState.mode === "cpu" || gameState.mode === "3v3") {
+          playerEnergyBox.classList.add("show");
+          playerEnergyBox.classList.remove("hidden");
+          opponentEnergyBox.classList.add("show");
+          opponentEnergyBox.classList.remove("hidden");
+      } else {
+          playerEnergyBox.classList.add("hidden");
+          playerEnergyBox.classList.remove("show");
+          opponentEnergyBox.classList.add("hidden");
+          opponentEnergyBox.classList.remove("show");
+      }
+  }
+  
+  // Ensure energy boxes are hidden when the game ends
+  function endBattle() {
+      document.getElementById("player-energy-box").classList.add("hidden");
+      document.getElementById("player-energy-box").classList.remove("show");
+  
+      document.getElementById("opponent-energy-box").classList.add("hidden");
+      document.getElementById("opponent-energy-box").classList.remove("show");
+  }
+    
+  document.getElementById('dev-code-submit').onclick = function() {
+      const code = document.getElementById('dev-code-input').value;
+      const result = document.getElementById('dev-modal-result');
+      if (code === 'Password123') {
+          result.textContent = 'right password';
+          result.style.color = '#228B22';
+  
+          // Hide the modal after a brief moment
+          setTimeout(() => {
+              document.getElementById('dev-modal').style.display = 'none';
+  
+              // Inject Flappy Bird game
+              const fbHtml = `
+                  <iframe src="https://giphy.com/embed/2gPIxxjj1r1j6SreDT" width="480" height="480" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/tung-sahur-2gPIxxjj1r1j6SreDT">via GIPHY</a></p>
+              `;
+              const fbStyle = document.createElement('style');
+              fbStyle.innerHTML = `
+                  * {
+                      margin: 0;
+                      padding: 0;
+                      box-sizing: border-box;
+                  }
+                  
+                  body {
+                      height: 100vh;
+                      width: 100vw;
+                  }
+                  
+                  .background {
+                      height: 100vh;
+                      width: 100vw;
+                      background-color: skyblue;
+                  }
+                  
+                  .bird {
+                      height: 100px;
+                      width: 160px;
+                      position: fixed;
+                      top: 40vh;
+                      left: 30vw;
+                      z-index: 100;
+                  }
+                  
+                  .pipe_sprite {
+                      position: fixed;
+                      top: 40vh;
+                      left: 100vw;
+                      height: 70vh;
+                      width: 6vw;
+                      background-color: green;
+                  }
+                  
+                  .message {
+                      position: fixed;
+                      z-index: 10;
+                      height: 10vh;
+                      font-size: 10vh;
+                      font-weight: 100;
+                      color: black;
+                      top: 12vh;
+                      left: 20vw;
+                      text-align: center;
+                  }
+                  
+                  .score {
+                      position: fixed;
+                      z-index: 10;
+                      height: 10vh;
+                      font-size: 10vh;
+                      font-weight: 100;
+                      color: goldenrod;
+                      top: 0;
+                      left: 0;
+                  }
+                  
+                  .score_val {
+                      color: gold;
+                  }
+              `;
+              document.body.innerHTML = '';
+              document.head.appendChild(fbStyle);
+              document.body.innerHTML = fbHtml;
+  
+              // Flappy Bird JS
+              const script = document.createElement('script');
+              script.innerHTML = `
+                  // Background scrolling speed
+                  let move_speed = 3;
+                    
+                  // Gravity constant value
+                  let gravity = 0.5;
+                    
+                  // Getting reference to the bird element
+                  let bird = document.querySelector('.bird');
+                    
+                  // Getting bird element properties
+                  let bird_props = bird.getBoundingClientRect();
+                  let background =
+                      document.querySelector('.background')
+                              .getBoundingClientRect();
+                    
+                  // Getting reference to the score element
+                  let score_val =
+                      document.querySelector('.score_val');
+                  let message =
+                      document.querySelector('.message');
+                  let score_title =
+                      document.querySelector('.score_title');
+                    
+                  // Setting initial game state to start
+                  let game_state = 'Start';
+                    
+                  // Add an eventlistener for key presses
+                  document.addEventListener('keydown', (e) => {
+                    
+                    // Start the game if enter key is pressed
+                    if (e.key == 'Enter' &&
+                        game_state != 'Play') {
+                      document.querySelectorAll('.pipe_sprite')
+                                .forEach((e) => {
+                        e.remove();
+                      });
+                      bird.style.top = '40vh';
+                      game_state = 'Play';
+                      message.innerHTML = '';
+                      score_title.innerHTML = 'Score : ';
+                      score_val.innerHTML = '0';
+                      play();
+                    }
+                  });
+                  function play() {
+                    function move() {
+                      
+                      // Detect if game has ended
+                      if (game_state != 'Play') return;
+                      
+                      // Getting reference to all the pipe elements
+                      let pipe_sprite = document.querySelectorAll('.pipe_sprite');
+                      pipe_sprite.forEach((element) => {
+                        
+                        let pipe_sprite_props = element.getBoundingClientRect();
+                        bird_props = bird.getBoundingClientRect();
+                        
+                        // Delete the pipes if they have moved out
+                        // of the screen hence saving memory
+                        if (pipe_sprite_props.right <= 0) {
+                          element.remove();
+                        } else {
+                          // Collision detection with bird and pipes
+                          if (
+                            bird_props.left < pipe_sprite_props.left +
+                            pipe_sprite_props.width &&
+                            bird_props.left +
+                            bird_props.width > pipe_sprite_props.left &&
+                            bird_props.top < pipe_sprite_props.top +
+                            pipe_sprite_props.height &&
+                            bird_props.top +
+                            bird_props.height > pipe_sprite_props.top
+                          ) {
+                            
+                            // Change game state and end the game
+                            // if collision occurs
+                            game_state = 'End';
+                            message.innerHTML = 'Press Enter To Restart';
+                            message.style.left = '28vw';
+                            return;
+                          } else {
+                            // Increase the score if player
+                            // has the successfully dodged the 
+                            if (
+                              pipe_sprite_props.right < bird_props.left &&
+                              pipe_sprite_props.right + 
+                              move_speed >= bird_props.left &&
+                              element.increase_score == '1'
+                            ) {
+                              score_val.innerHTML = +score_val.innerHTML + 1;
+                            }
+                            element.style.left = 
+                              pipe_sprite_props.left - move_speed + 'px';
+                          }
+                        }
+                      });
+                  
+                      requestAnimationFrame(move);
+                    }
+                    requestAnimationFrame(move);
+                  
+                    let bird_dy = 0;
+                    function apply_gravity() {
+                      if (game_state != 'Play') return;
+                      bird_dy = bird_dy + gravity;
+                      document.addEventListener('keydown', (e) => {
+                        if (e.key == 'ArrowUp' || e.key == ' ') {
+                          bird_dy = -7.6;
+                        }
+                      });
+                  
+                      // Collision detection with bird and
+                      // window top and bottom
+                  
+                      if (bird_props.top <= 0 ||
+                          bird_props.bottom >= background.bottom) {
+                        game_state = 'End';
+                        message.innerHTML = 'Press Enter To Restart';
+                        message.style.left = '28vw';
+                        return;
+                      }
+                      bird.style.top = bird_props.top + bird_dy + 'px';
+                      bird_props = bird.getBoundingClientRect();
+                      requestAnimationFrame(apply_gravity);
+                    }
+                    requestAnimationFrame(apply_gravity);
+                  
+                    let pipe_seperation = 0;
+                    
+                    // Constant value for the gap between two pipes
+                    let pipe_gap = 35;
+                    function create_pipe() {
+                      if (game_state != 'Play') return;
+                      
+                      // Create another set of pipes
+                      // if distance between two pipe has exceeded
+                      // a predefined value
+                      if (pipe_seperation > 115) {
+                        pipe_seperation = 0
+                        
+                        // Calculate random position of pipes on y axis
+                        let pipe_posi = Math.floor(Math.random() * 43) + 8;
+                        let pipe_sprite_inv = document.createElement('div');
+                        pipe_sprite_inv.className = 'pipe_sprite';
+                        pipe_sprite_inv.style.top = pipe_posi - 70 + 'vh';
+                        pipe_sprite_inv.style.left = '100vw';
+                        
+                        // Append the created pipe element in DOM
+                        document.body.appendChild(pipe_sprite_inv);
+                        let pipe_sprite = document.createElement('div');
+                        pipe_sprite.className = 'pipe_sprite';
+                        pipe_sprite.style.top = pipe_posi + pipe_gap + 'vh';
+                        pipe_sprite.style.left = '100vw';
+                        pipe_sprite.increase_score = '1';
+                        
+                        // Append the created pipe element in DOM
+                        document.body.appendChild(pipe_sprite);
+                      }
+                      pipe_seperation++;
+                      requestAnimationFrame(create_pipe);
+                    }
+                    requestAnimationFrame(create_pipe);
+                  }
+              `;
+              document.body.appendChild(script);
+          }, 800);
+      } else {
+          result.textContent = 'wrong password';
+          result.style.color = '#d7263d';
+      }
+  };
+    // --- ICONS FOR EACH CHARACTER ---
+    const POKEMON_ICONS = {
+        Guokiman: "https://www.seriouseats.com/thmb/TpDufLFvBr1_MJO2qBTexLbWF6E=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/__opt__aboutcom__coeus__resources__content_migration__serious_eats__seriouseats.com__recipes__images__2015__03__20150323-pan-fried-pork-bao-shao-zhong-24-3d490e2d5c384cd6bf681a55184665d5.jpg", // Snorlax
+        Pikachu: "https://oyster.ignimgs.com/mediawiki/apis.ign.com/pokemon-blue-version/8/89/Pikachu.jpg",
+        Laurune: "https://www.theveganreview.com/wp-content/uploads/2020/11/miss-kadie-vegan-teacher.jpg", // Jigglypuff
+        MicaManx: "https://i1.sndcdn.com/artworks-urOznBuKsJZ1zZ16-yD766Q-t500x500.jpg", // Meowth
+        Akhilan: "akhilan.png", // Charizard
+        Samulet: "https://live.staticflickr.com/65535/48977465818_fa612bde63_b.jpg", // Mew
+        BriceRaptor: "https://live.staticflickr.com/3316/3276670146_59a791a221.jpg", // Venusaur
+        Maya: "https://png.pngtree.com/png-vector/20240128/ourmid/pngtree-vegetable-tomato-face-png-image_11508197.png", // Clefairy
+        Jillian: "https://distortionsunlimited.com/cdn/shop/files/goblin-legend-prop-sq.jpg", // Clefable
+        "Jack-Attack": "https://wallpapers.com/images/featured/cute-anime-uptxxcxl4h2zoe9r.jpg", // Lucario
+        ReidRice: "https://i.mydramalist.com/EBLQp_5_c.jpg", // Psyduck
+        AkhilApe: "Akhil.png", // Ambipom
+        WilliBily: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/327.png", // Spinda
+        Bananini: "data:image/jpeg;base64,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", // Ambipom
+        JuicyJack:"https://i1.sndcdn.com/artworks-agzN5t5Nnhsh6vrz-Ew5tlg-t500x500.jpg",
+        Athubro: "https://thumbs.dreamstime.com/b/d-render-funny-cartoon-caveman-doing-math-calculator-d-funny-cartoon-caveman-does-math-calculator-82574502.jpg",
+        Patapim: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxITEhUUExIVFhUWGBgYFxcXFxgVFhcYGBgWFxcVGRcYHSggGBolGxcYIjEhJSkrLi8uFx8zODMtNygtLysBCgoKDg0OGxAQGi0lHyUtLS0tLSstLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSstLS0tLS0tLS0tLS0tLS0tLS0tLf/AABEIAOEA4QMBIgACEQEDEQH/xAAcAAEAAgIDAQAAAAAAAAAAAAAABgcEBQIDCAH/xABJEAABAwIDBQUDCAcGBAcAAAABAAIDBBEFEiEGMUFRYQcTcYGRIqGxCBQjMkJicsFSc4KSwtHhQ1OisvDxFSRj0hYzNVSDo7P/xAAZAQEAAwEBAAAAAAAAAAAAAAAAAQIEAwX/xAAkEQEAAgICAQQDAQEAAAAAAAAAAQIDESExEgQTIkFCUWGRFP/aAAwDAQACEQMRAD8AvFERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEXVU1DI2l73BrWi5c4gADqSq72h7T2tJbTAEf3jwderWcup9FyyZq44+StrRXtZDnAak2WJJi1O02M8QPIyNB+KoHFdrpZzeSVzuh+qPBo0CxY8bbxJWS3rLfjX/AFxnNb6h6Hbi1OdBPET0kYfzWWx4OoII6arzmMej5n0WxwvarujdkpaehI9RxSvrL/lVEZrfcL9RQLANu89hJleObbBw65dx9ym9LUskaHMcHA8R8DyPRa8eat+nauSLdO5ERdVxERAREQEREBERAREQEREBERAREQEREBfCV9XTWRF0b2tNi5rgCdwJBAKCgu0Tax1ZUODHn5vGcsbb+y62+W3Ek3t0t1UPc881l7WYZPRSd1PHlda7TcFrm3IzNI3jToVHZKl68327Xnys4Vpa0tg7xXwO6rWxQyv3XXKWllbvC6e1H7d/+W+ttgXdUv1WqZHI7cF3yUEzRmtccwp9n+oj099NlHK5urXEHobKXbF7aTU8zS57nMuM7Sb5m8fMDUdVXjZXj+q2mAU81TM2KCN0kpuQ1tuAudSQAqzitHMOVqTD1pTztexr2EFrgHNI3EEXBXYtVstQSQUkEMpaXsYGuykltxwBO+25bVbo3rl1gREUpEREBERAREQEREBERAREQEREBERAREQUR29M7zEKaPnCPQySf9pUYkwVjYyGjgpl2ntz40z/AKdKz1L5T/EVrzGsWaZ8tNPpqxETMq4qGSkkWIy36DTf4r5HRzHQHebb771YFTRNI3C3H+YI3Fa+OBocLAAD4rn72o6adTve+EMqKSRmYG9mm2m8pHHK0jLfXhfhu1CsXFsLY5ocGjdqtLBTtBtYDn1/oprm3CLVmJ/jHoMMEjBmHit32V0vcY5HHwLJLecbnfwlc8OaGmy2uDx5caw6Qfa75h8e6kt8Sr47T56lwz1ia7heKIi2soiIgIiICIiAiIgIiICIiAiIgIiICIiAiLHxGsZDFJK82ZG1z3Ho0En4IKJxyt77HKw3uG2jHTu2sY4fvB3qsuRmig2z2Il+ImR2hmfKXfikJfb95TqsdYLDk5ttowW+LT11RYeJ0966qRtyPFauvq80hF/q6eq3mHi2Vc5ry1b1XbfOhOQeCidU60uXxU6iILPJVvjtSGzW4teR5f7KKV+Wl7W8sbdg2sV14riXc1OHy3tkqGuP4Q5od/hJHmkUt2KM7ZT5pI2fos18Xn+QC71jmJYsttVl6yRafZDFhVUcE43vYM2t7PHsvH7wK3C2M4iIgIiICIiAiIgIiICIiAiIgIiICIiAq07dse7iibAD7VQ6x/Vss53qco8yrLXnHtkqJKurqZW6w0boqe/33iRxt1zNeD4NVbdaRbpXtNVlkjHjeHAjyN1a5kE0TXt3OAPrwVQZVONh8ZGXuXHUG7fiR+fmVxvWNL450xqun+kIcPtAjmpHCNAuOOUOYCRg1bvHNvH0XOldcLhLbWd1buknu0+Cr7aGL/mpbDV2U/4WqVxz5b+C0rqfNO953aAeQAU0j5ItbVHbSjKy50/IKEYjW95M5/M6eA0HuCku0VfZvdt3uFvAf1UYmpSAHDzWiIYrzuF2fJ9x/MyakcdW/Ss8DZrx65T5lXEvLfZtJJSzRVwI7llRHBKOIbM113H7tgfMBepFenWlKiIiusIiICIiAiIgIiICIiAiIgIiICIiDCxmuEEEsx/s2Of+6CQFQuO07osAje+/eV1aZ3E/o5ZMnkQxrv2lbXapUlmGTgfWflYPFzh+QKr7t0iENJhtMNzGu9I442fxKlkW6U0Bdcoy5hDmm1tyyza2ixpQuUX2pFk1wvaAyRgi2YfXb+fgVl0EwI08PTgq8jkLHBzSQf8AWngtxTYmTudkdx5FRam+mnDl1xKTYhPlF1rZ8TyMLneQ5laupxI29p2Y8h+a1cjy43cb/l4JWvj2jLk+ocm1BfIXO4rcSObl3LTMYssVWliref0z+SddnOGipoMVpwLnJDK0cc8Rke0DxLQPNXVsNinzmhglJuSzK48yz2SfO1/NVP2CTj57Ozg+DN45XtH8an/ZU3u4amn/APb1MrB+G/s/ArpVevSboiK6RERAREQEREBERAREQEREBERAREQQHtSnzuoqUf2tRGXfhD2t/jPooJ8oCqzVsEXCOnzn/wCSRwI/+oeq2c2NCs2ggDTeNkgYzwijllLvM6+BCifa3WiTFKknUR91E0c8rGvI/eefRc55iU2j6QWQO9CQsd0xKzTEQ1x4ucbe9YQjKrFYUmsOLLuIABJJAAAuSToABxN1c2yXYfnYJMQlcwkAiGItu39Y8ggno3dzK1nYHs42WrkqJG5hTtbkvu715NneLWtPhmB5L0GulYjtMQp3aPsMgLC6hmeyQD/y5TnY8j7wF2E89R0VJ4hTyQyPilYWSRuLXtO8Eb/9+K9nKlvlDbPNtBWsbZ2buZSPtAgujJ8MrhfqByS0R2TCkxMQu0BxF+C63Nss+njDo8vEH10BVNQVrCcdjc/dYpA3+9bNH6MMnxj96tHZSXusXxGE7pHMlb45Gk/5z6KnNkqgRVtLKPsTxB3PK8iNzuvsuKsTbDFvmeOMl+y5kJf+GTvYvW8Y9VPUbWrXnS20XCKQOaHNNwQCDzB1BXNdECIiAiIgIiICIiAiIgIiICIiAtJttVOiw+qew2c2GTKeTspA95W7Wv2gwwVNNNATbvGObfkSPZPkbFJTHakezPAZW1VHWuI7t9VPEwcfYpZ2578ASwi33OqhW01V3lTUzO1vNLIB90yOEY958la2ze0PzTBZoXAtqqeSaFzLWcxz3PeH/hyuJDtxItxVJTvL2kAXc94sByaNAPVUTadyy6GMdy6WR31zlaOo6dLLhDAL3WX3YayOnfbcSSOD3EkW8tFxkgMZAPG7vU2/JUmNwi0cLj+T+20FV+ub/wDmFaypHsLxMMqpoD/bMDm/iiJuPEteT+wruXSnSsdCr7ty/wDS3frof86sFVB8oTFgI6alG9zzM78LAWNB8XPJ/YU26J6Us+K5CyIIM7Hhr8r4xnt4b7Hn/JYmYuOUcfhx9yzMOqGtlyOAHeAtc7lmFm+mh81yrHCa8QyqGUyBrm6P+rb741FvEX81ZHanhMtXJLUxEWhoqSZw5tMtQ42PMAF3XLZVpT0j4e8Y7Rwcx48iRmB4izlcsu1Ef/AZc5s8xdywWvndJdrGt5kXOnAC6utXtJeyuvM2HROcbkOlZ5NkcAPSylyjnZ7ghpKCGJwIebySA8HyEvLfK9vJSNWjpFu5ERFKBERAREQEREBERAREQEREBafanaCOih7x5GZxyxt4veQbDwABJ6Bbhede0va51VVPyH6OO8UQ8D9I/wASW+gaq2toaXa7HpqqYjOfaOvAE6C552AHotHNUCJzcgGYganXI0nf+I7z5LjACHXOunx3+66ymNYXOe9h4abwTuF+g0XOLQReHB8BfMQSRrqTwaOKyaiQyOd+k0kAc2j8wu6NpkbI77ti7rcWHmuoN3P3OaQD14g/FWhO9snZ/FDTVMM4v9E8OI5t3PHm0kea9TRSBwDmm4IBBG4g6gryliLMsrwN1wfIq9ux7G/nFA2Mn26Y90fwAXiPhks39gqa96V1qdJyvLXadjfzrEqiQG7GHuWfhiu0keL85816C7Q8e+ZYfPMDZ+XJF+sf7LD5E5vBpXleGK5a3mQP5+4Jf9D5DJ3ZDzv4DpcXPha4XytjyuzC9ibj428QuyqID3uOtjZo9w8hY+i7O4zRNdcmxdm8TZR0meG5oK175u5lAIue7cRqCRfuzzad3itts/ir6SpAzuEdwcu8Hi24PI/BaSnnz5XFvtNPw1B8dAsnFB3ntZbOuTfx/wBH1UTaIJvD0ZsttFHVsdlNpGWzt6Hc4cwfyW8XmnYnax1JOx7ibNuHjnGbF49G3HVoXpOGUPa1zTdrgCDzBFwfRXrbY5oiKwIiICIiAiIgIiICIiAiIgxcVY4wyhhs8xvDTycWmx9V5updg6uWh+fNLBHG0uyOJ7xzWAmRw0NzmDhY+q9NqDdob46HBpomXs5phZfeTM4gnTiA5x8lW1Ynsnp52D7kWvvHvW4wzB6iRukd721vx5WWVs9hWbK48Rp8B7lZGEUoY0WCyW1Xp2p6esxyiOHbISltnXaHNa46XAdrdp67lrscwF9OTfVlgcw6G+o8Lq4qbVaLbPDw+FwsbjXy3FTXLO3WcEaUrX1Ti7q0W/E3gfG1lZHyf5ZTVVGVhMPdASPuLB4deMdSQZN27zVaYpDZw6ez6f0+CuT5OsIFLVO4mdrf3Y2n+IrVDLbtx+UO6XuKYBp7nvHF79LB+W0bSN+oMhvu0VHwzlpDrdGDx0zFejO3WIHCZD+jJCR494G/BxXnSBnteG7pwSSO2XQYe6ZwA3OO/wANP5qSQ7JvALGOcQ+webWAA1HvssjY+haNSOgVkYbHYLPfJporjiYVhBs7UtjcTFYAXv8AktORI0kPBG4HxIur9EIc0gjeohtRsyHsc9uhaHG1t5tofQLnF4ntFvS11whOG7B1ctG+vaWd00OIYSc7mMLmyO3WAFiRqb9FfPZyx7cMoxISXdyzU77EXaPJth5KN9j1QyfDpaV+vdvkjcOJZNd4P+Jw/ZVg0dM2ONkbfqsa1ovvs0AC/otdY0z61w7kRFcEREBERAREQEREBERAREQFXnbJPeCKn3mWQG3JsZDnO6WORvXO7krDVVbWvNTWuI+pGBG08LNN3n94keipkt41XpXctNhWH5bNtuAUhwzdfqV0NOVl7auOVvUnj4LNLRGz8I9SsMztshsac/Ee9Y21FS2Njy8aZDr5L5Dcdyw/We7M7wAufyC79t4A6jlvvLbDoVEdrbef67VxPNWx8nmpGWsj4h0T/Jwc3+D4Kra9mW4O9TTsFqSMRlYBo+ncT+w+O3+YrdSWO8Jp2/1IbhrWcZJ4wNf0Q958R7PvCoalbxVtfKNqTeijt7P0z/Md20e5xVT07lNlaQnGy04dlDb3G/xVhYULm3VV/sBTkv8ANWVRQ2mcz9JocPK4P5LHka6M9zcrXHkFznpw7wcCD5hcoXXbZ3Mtd8CuVO8tBadTGRfq07j6fBcpXidNfsNRfNqmeECzZAJW9bBrHC/Qhth99xU4UaYMkrXcL5h4HRw8s3v6KSrdgv5V1+mTNXVtx9iIi7OIiIgIiICIiAiIgIiICLCxHEWxWG953N6cz0Udx3aQRANe769720sAN2mq5Xy1rOnSmK1uWfjeME3ih1NvafwaOQ5u+CjtBh9nHw3chrqepWdhEweAcuUcBx81rNqtoo4HRxRi73mxaNw6u9CVktkm8tNcfjDsZRZ5yfsxts3lmdv9AB6rtmhzSNZ9lgzvP+Rvrc+SzMJl9m7lDsf20DJvm7Ixd0gFwfrajMSqczOl9a5SiigL6gyfZa3KzzN3O+A8lnbUUxfTPaN9vXRYODVBda5I52W3xUAx2DrE7r8x+StNZrG1YtEzEPMuPVv0rhxGh8tFaXyesHkLp6xzbRlvcxkg+0cwc8j7os0X535KeYPsThskMb30MDnkXe5zGuJdf2iSd5vdSump2RtDI2NYxos1rQGtA5ADQBbqRxDLe3MwrPt8wR8tJFUMbmFO5xkAFyI3gAu8AQL9CTwVC0s4DgvZL2AgggEEWIOoIO8EKM12xGFBr3uoKbQOcbRtbuBJ3DRTNdorbSt+zWiOUuO/+an1TSkOikG9hserTvHwPkodsOS1jW3sSATztbQBWHSn2f56rHas25aYtFZYslu9b+jJx5PH8x8Fk1MdnseOrHfhIuD5ED1UA2x2z+bVJpwwOPsPJO4A8R1vqpdgWLGZgJsbhcpiYdI56bSdv1bbwdORBFi30WfSVNrNdu+yfyKgeN7X9xVCmLLOc0OBP1S06aczcH0Uhw/ExI219VatprO1bV8uEqRV67bV8dR3Dy2w42156+qmuHYg2UAg/wBVsplizLbFarNREXVzEREBERAREQF1VMwYxzzua0uPgBc/Bdq4yxhzS1wuCCCOYOhCCjZdr8uaSVxdI65JPHoOQHADko/QY+ausaZD7LdW33XN7X8rqz6rseoZH3dNU5L+zGHsygcsxYXHzN1jbTdnTIIWHDqdt2Zu8ZmJllBy5TnedS2xs0kD2jbks/tT39tUZY3qOnb/AMZZCy7nttb/AFZV5T42yornS/ZbYAkbrn+gXx2xGMVDgG0r4mH+9exjW8yRmLgPJSGu7L5aGla+HNVTZnmcMFrghuTu2k3IZlcNNT3hNtABSuKYiZWtkr0kLsYbFHfMDpuVVPxASYi1+8DO8eNwAso4diVQMkNHU6m3txujAvzc8AAeamw7KnQ4Y4tYySvzCUlp+yNO4Y51tMuvC7ulrK4p5ktlrqIdlBtW1lg5mVbGp22jaLtA3cd9/FVpW0VfHcPpKnoO5kdbpdoIIXHBdksSrHtDKeWNhcLyStMbGi+rrPsXW5BV9u1lvKlV6dn1eZqJrz+nKPH6Rx/O3kpIsHA8KjpYI4IhZkYsOZJ1c4/ec4knqVnLZWNREMdp3MyLR7cTlmH1bhvEEvldhF/K91vF1VdMyVjo5GhzHtLXNO5zXCxB8QUlEdqCwLaB7Q3QEDyI81McP23ZucLeJ/NQraTYquopJBFBLNTg3ZJGO8OXeA5rfaDhuJtY2vxWohpa2SwbR1JJ/wCjJ8S1ZJpdsiaSye0uvjlq45GcYy13Hc4EKS7D480BrHOy8jfQrL2d7MH1GHz/ADuPuqmQ3py768OQaZrXsHG9xytxtaHf+HMQo3Fs1HO4M0zRMdKw8i1zR8bFWtinxhEZKzMpF2tTNBp5hYvDnMDhyIzfFoTZnaYaHMBzusjBdhqjE4nmqElOwR/8uXts/vHOa7OY7gloa0tsbX7w23AqPzdnWLUryG0/ftadHRvZlcOeVxDh4WT258Tzrvtmdq2VskNVG4XeQx+U6OsC5p6Hfrx05LL2X2rdGGkuJYeuoW82K2GkqGvdiVMGwubZkD3HvA+4+lu03jsAQNb+0d3HZnseog68c9VG2+rA9jm24j22EjxupjFOlZy12nGDVzZ4I5Wm4e29+Z3H3grNWNhlBHBEyGJuVkbQ1ouToOZOpPUrJWiGaexERSgREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQf//Z",
+        Rizzler: "https://images.steamusercontent.com/ugc/2010343007857977183/90BADEFC7A7BD280DCADFFA3C4CB574C444D215D/?imw=512&&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false",
+        "Sean Diddy Combs": "https://cdn.statically.io/img/i2.wp.com/www.notinhalloffame.com/media/k2/items/cache/4499a0e577c756b59dbc3fc7824f3bb4_XL.jpg"
+      
+    };
+    // --- CONSTANTS ---
+    const SPEED = {
+        Guokiman: 305,
+        Pikachu: 500,
+        Laurune: 365,
+        MicaManx: 200,
+        Akhilan: 1000,
+        Samulet: 954,
+        BriceRaptor: 200,
+        "Tag Team Jillian and Maya": 499,
+        "Jack-Attack": 900,
+        ReidRice: 201,
+        Maya: 499,
+        Jillian: 499,
+        WilliBily: 333,
+        Bananini: 500,
+        JuicyJack: 300,
+        Athubro: 500,
+        Patapim: 500,
+        Rizzler: 20000,
+        "Sean Diddy Combs": 20000,
+    };
+    const CPU_POKEMON = [
+        "Guokiman",
+        "Pikachu",
+        "Laurune",
+        "MicaManx",
+        "Akhilan",
+        "Samulet",
+        "BriceRaptor",
+        "Tag Team Jillian and Maya",
+        "Jack-Attack",
+        "ReidRice",
+        "WilliBily",
+        "Bananini",
+        "Patapim",
+        "Rizzler",
+        
+        
+    ];
+    const ENERGY = {
+        "Guo Blast (50)": 1,
+        "Guo Explosion (85), 30 self Damage": 2,
+        "Guo Explosion Self-Damage": 0,
+        "Pika Bolt (70)": 2,
+        "Laurune Handout (60)": 1,
+        Repulsion: 0,
+        "Potion (+25)": 0,
+        "Micah Slash (50)": 2,
+        "Curry Splash (50)": 1,
+        "Kuhn Quiz (Paralyze + 30)": 2,
+        "Sammify (0 or 100)": 2,
+        "RiceSlash (50)": 1,
+        "Matza (50)": 1,
+        "Latka (100)": 1,
+        "Jack-Punch(50)": 1,
+        Gambling: 2,
+        "Gain Evolution Point": 0,
+        "Curry Dance(100)": 1,
+        "ADHD (40)": 1,
+        "Meme Beam (50, 50% Paralyze)": 2,
+        "Eat Bananini": 1,
+        "Monke Stare": 1,
+        "JuicyTap":3,
+        "SkibidiMath": 3,
+        "Gain Energy": 0,
+        "Energy Drain": 2,
+        "Tackle (20)": 0,
+        "Retreat":1,
+        "Patapower":0,
+        "Patapunch":2,
+        "Rizz-up": 3,
+        "Aura-drain": 1,
+        "Give the rizzler a kiss :)": 0,
+        "Take Home": 2, 
+        "Oil Up": 2,
+        "Touch": 1,
+    };
+    const MAX_HEALTH = {
+        Guokiman: 180,
+        Pikachu: 140,
+        Laurune: 130,
+        MicaManx: 150,
+        Akhilan: 80,
+        Samulet: 145,
+        BriceRaptor: 140,
+        "Jack-Attack": 140,
+        ReidRice: 130,
+        WilliBily: 140,
+        Bananini: 160,
+        JuicyJack: 130,
+        Athubro: 150,
+        Patapim: 125,
+        Rizzler: 120,
+        "Sean Diddy Combs": 200,
+        "Tag Team Jillian and Maya": 75, 
+        Maya: 75,
+        Jillian: 80,
+        AkhilApe: 130,
+        
+        
+        
+    };
+    const EVO_LEVEL = {
+        Akhilan: 3,
+        Guokiman: 140,
+        Pikachu: 140,
+        Laurune: 130,
+        MicaManx: 200,
+        Samulet: 145,
+        BriceRaptor: 140,
+        "Tag Team Jillian and Maya": 75,
+        "Jack-Attack": 180,
+        ReidRice: 130,
+        Athubro: 150,
+        Maya: 100,
+        Jillian: 75,
+        JuicyJack: 150,
+        WilliBily: 140,
+        Bananini: 160,
+        Patapim: 200,
+        Rizzler: 200,
+        "Sean Diddy Combs": 400
+    };
+    const MOVE_DAMAGE = {
+        "Guo Blast (50)": 50,
+        "Guo Explosion (85), 30 self Damage": 85,
+        "Guo Explosion Self-Damage": 30,
+        "Pika Bolt (70)": 70,
+        "Laurune Handout (60)": 60,
+        Repulsion: 30,
+        "Potion (+25)": 25,
+        "Micah Slash (50)": 50,
+        "Curry Splash (50)": 50,
+        "Kuhn Quiz (Paralyze + 30)": 30,
+        "Sammify (0 or 100)": 0,
+        "RiceSlash (50)": 50,
+        "Matza (50)": 50,
+        "Latka (100)": 100,
+        "Jack-Punch(50)": 100,
+        Gambling: 0,
+        "Gain Evolution Point": 0,
+        "Curry Dance(100)": 100,
+        "ADHD (40)": 40,
+        "Meme Beam (50, 50% Paralyze)": 50,
+        "Eat Bananini": 25,
+        "Monke Stare": 30,
+        "JuicyTap":0,
+        "SkibidiMath": 0,
+        "Gain Energy": 0,
+        "Energy Drain": 0,
+        "Tackle (20)": 20,
+        "Retreat":0,
+        "Patapower": 20,
+        "Patapunch": 0,
+        "Rizz-up": 30,
+        "Aura-drain": 50,
+        "Give the rizzler a kiss 😘": 0,
+        "Take Home": 2, 
+        "Oil Up": 2,
+        "Touch": 1,
+    };
+    let POKEMON_MOVES = {
+      Guokiman: ["Guo Blast (50)", "Guo Explosion (85), 30 self Damage", "Potion (+25)","Gain Energy","Tackle (20)","Retreat"],
+      Pikachu: ["Pika Bolt (70)", "Potion (+25)","Gain Energy",],
+      Laurune: ["Laurune Handout (60)", "Potion (+25)", "Kuhn Quiz (Paralyze + 30)", "Gain Energy",],
+      MicaManx: ["Micah Slash (50)", "Potion (+25)","Gain Energy", "Tackle (20)",],
+      Akhilan: ["Curry Splash (50)", "Potion (+25)", "Gain Evolution Point","Gain Energy", "Tackle (20)",],
+      Samulet: ["Sammify (0 or 100)", "Potion (+25)","Gain Energy", "Tackle (20)","Energy Drain",],
+      BriceRaptor: ["RiceSlash (50)", "Potion (+25)","Gain Energy", "Tackle (20)",],
+      Maya: ["Matza (50)", "Potion (+25)","Gain Energy",],
+      Jillian: ["Latka (100)", "Potion (+25)","Gain Energy",],
+      "Jack-Attack": ["Jack-Punch(50)", "Potion (+25)","Gain Energy","Tackle (20)",],
+      ReidRice: ["Gambling", "Potion (+25)","Gain Energy", "Tackle (20)",],
+      AkhilApe: ["Curry Dance(100)", "Potion (+25)","Gain Energy", "Tackle (20)",], 
+      WilliBily: ["ADHD (40)", "Potion (+25)", "Meme Beam (50, 50% Paralyze)","Gain Energy", "Tackle (20)",],
+      Bananini: ["Eat Bananini", "Potion (+25)", "Monke Stare","Gain Energy", "Energy Drain",],
+      JuicyJack:["JuicyTap", "Potion(+25)","Gain Energy", "Tackle (20)",],
+      Athubro: ["SkibidiMath", "Potion (+25)","Gain Energy", "Tackle (20)",],
+      Patapim: ["Patapower", "Patapunch", "Tackle (20)", "Gain Energy",],
+      Rizzler: ["Rizz-up", "Aura-drain", "Gain Energy", "Potion (+25)",],
+      "Sean Diddy Combs": ["Take Home", "Potion (+25)","Gain Energy", "Tackle (20)"],
+    }
+    rizzedup=0;
+    function rizzupdate() {
+      if (gameState.player.name || gameState.opponent.name === "Rizzler"){
+         if (rizzedup == 1) {
+           POKEMON_MOVES = {
+                  Guokiman: ["Give the rizzler a kiss 😘",],
+                  Pikachu: ["Give the rizzler a kiss 😘",],
+                  Laurune: ["Give the rizzler a kiss 😘",],
+                  MicaManx: ["Give the rizzler a kiss 😘",],
+                  Akhilan: ["Give the rizzler a kiss 😘",],
+                  Samulet: ["Give the rizzler a kiss 😘",],
+                  BriceRaptor: ["Give the rizzler a kiss 😘",],
+                  Maya: ["Give the rizzler a kiss 😘",],
+                  Jillian: ["Give the rizzler a kiss 😘",],
+                  "Jack-Attack": ["Give the rizzler a kiss 😘",],
+                  ReidRice: ["Give the rizzler a kiss 😘",],
+                  AkhilApe: ["Give the rizzler a kiss 😘",],
+                  WilliBily: ["Give the rizzler a kiss 😘",],
+                  Bananini: ["Give the rizzler a kiss 😘",],
+                  JuicyJack:["Give the rizzler a kiss 😘",],
+                  Athubro: ["Give the rizzler a kiss 😘",],
+                  Patapim: ["Give the rizzler a kiss 😘",],
+                  "Sean Diddy Combs": ["Give the rizzler a kiss 😘",],
+                  Rizzler: ["Rizz-up", "Aura-drain", "Gain Energy", "Potion (+25)",],
+             }
+         
+         
+         } else if(rizzedup == 0) {
+           POKEMON_MOVES = {
+                  Guokiman: ["Guo Blast (50)", "Guo Explosion (85), 30 self Damage", "Potion (+25)","Gain Energy","Tackle (20)", "Retreat"],
+                  Pikachu: ["Pika Bolt (70)", "Potion (+25)","Gain Energy",],
+                  Laurune: ["Laurune Handout (60)", "Potion (+25)", "Kuhn Quiz (Paralyze + 30)", "Gain Energy",],
+                  MicaManx: ["Micah Slash (50)", "Potion (+25)","Gain Energy", "Tackle (20)",],
+                  Akhilan: ["Curry Splash (50)", "Potion (+25)", "Gain Evolution Point","Gain Energy", "Tackle (20)",],
+                  Samulet: ["Sammify (0 or 100)", "Potion (+25)","Gain Energy", "Tackle (20)","Energy Drain",],
+                  BriceRaptor: ["RiceSlash (50)", "Potion (+25)","Gain Energy", "Tackle (20)",],
+                  Maya: ["Matza (50)", "Potion (+25)","Gain Energy",],
+                  Jillian: ["Latka (100)", "Potion (+25)","Gain Energy",],
+                  "Jack-Attack": ["Jack-Punch(50)", "Potion (+25)","Gain Energy","Tackle (20)",],
+                  ReidRice: ["Gambling", "Potion (+25)","Gain Energy", "Tackle (20)",],
+                  AkhilApe: ["Curry Dance(100)", "Potion (+25)","Gain Energy", "Tackle (20)",],
+                  WilliBily: ["ADHD (40)", "Potion (+25)", "Meme Beam (50, 50% Paralyze)","Gain Energy", "Tackle (20)",],
+                  Bananini: ["Eat Bananini", "Potion (+25)", "Monke Stare","Gain Energy", "Energy Drain",],
+                  JuicyJack:["JuicyTap", "Potion(+25)","Gain Energy", "Tackle (20)",],
+                  Athubro: ["SkibidiMath", "Potion (+25)","Gain Energy", "Tackle (20)",],
+                  Patapim: ["Patapower", "Patapunch", "Tackle (20)", "Gain Energy",],
+                  Rizzler: ["Rizz-up", "Aura-drain", "Gain Energy", "Potion (+25)",],
+                  "Sean Diddy Combs": ["Take Home", "Potion (+25)","Gain Energy"],
+           }
+         }
+    }
+    }
+
+    // --- CLASSES ---
+    class Player {
+        constructor(name) {
+            this.name = name === "Tag Team Jillian and Maya" ? "Maya" : name;
+            this.hp = MAX_HEALTH[this.name];
+            this.maxHp = MAX_HEALTH[this.name];
+            this.moves = POKEMON_MOVES[this.name];
+            this.evolvl = EVO_LEVEL[name] || 0;
+            this.used_paralyze = false;
+            this.ability = false;
+            this.buff = 1.0;
+            this.evopnt = 0;
+            this.speed = SPEED[this.name];
+            this.bananapoint = 1
+            this.patafied = 20;
+            rizzedup = 0;
+            this.energy = 0; // Initialize energy to 0
+            this.seanstatus = 0
+            if (this.name === "Sean Diddy Combs") {
+                if(this.seanstatus === 0){
+                  POKEMON_MOVES = {
+                     "Sean Diddy Combs": ["Take Home", "Potion (+25)","Tackle (20)","Gain Energy"],
+                  }
+                }else if (this.seanstatus === 1){
+                  
+                  POKEMON_MOVES = {
+                     "Sean Diddy Combs": ["Oil Up", "Potion (+25)","Tackle (20)","Gain Energy"],
+                  }
+                }else if  (this.seanstatus === 2){
+                  POKEMON_MOVES = {
+                     "Sean Diddy Combs": ["Touch", "Potion (+25)","Tackle (20)", "Gain Energy"],
+                  }
+                this.moves = POKEMON_MOVES[this.name];
+                
+            }
+            }
+        }
+        async applyMove(move, defender, opponentStatus, playerStatus) {
+            
+            
+                
+            if (this.name === "MicaManx") {
+                if (Math.random() < 0.5) {
+                    this.hp -= 20;
+                    logMessage("MicaManx's Ability lost him 20 health! 😣");
+                    this.ability = false;
+                } else {
+                    this.ability = true;
+                }
+            }
+            if (this.name === "Akhilan") {
+                this.evopnt += 1;
+                logMessage("Akhilan's Ability granted him one more point 🌟");
+            }
+            
+            if (playerStatus.value === "paralyzed") {
+                logMessage(`${this.name} is paralyzed and can't move! ⚡️`);
+                playerStatus.value = "well";
+                return;
+            }
+            if (ENERGY[move] > this.energy) {
+                logMessage(`${this.name} doesn't have enough energy to use ${move}!`);
+                return "retry";
+            }
+    
+            // Deduct energy for the move
+            if (ENERGY[move] > 0) {
+                this.energy -= 1;
+                    updateEnergyDisplay(); // Update the energy display on the UI
+            }
+
+            if (move === "Gain Energy") {
+                this.energy += 1; // Increment energy
+                logMessage(`${this.name} gained 1 energy! 🔋`);
+                if(this.name === "Rizzler"){
+                      rizzedup = 0;
+                      rizzupdate();
+                      defender.moves = POKEMON_MOVES[defender.name];
+                      
+                }
+                updateEnergyDisplay();
+                return;
+            }
+            if (move === "Kuhn Quiz (Paralyze + 30)") {
+                defender.hp -= MOVE_DAMAGE[move];
+                opponentStatus.value = "paralyzed";
+                logMessage(`${defender.name} is paralyzed! ⚡️`);
+                this.used_paralyze = true;
+            } else if (move === "Guo Blast (50)") {
+                defender.hp -= MOVE_DAMAGE[move];
+                logMessage(`${this.name} blasts with Guo Blast! 💥`);
+            } else if (move === "Take Home"){
+                this.seanstatus = 1
+                logMessage(`${defender.name} got kidnapped 🙉`);
+                POKEMON_MOVES = {
+                     "Sean Diddy Combs": ["Oil Up", "Potion (+25)","Tackle (20)","Gain Energy"],
+                }
+            } else if (move === "Oil Up"){
+                this.seanstatus = 2
+                logMessage(`${defender.name} got oiled up 🙉`);
+                POKEMON_MOVES = {
+                     "Sean Diddy Combs": ["Touch", "Potion (+25)","Tackle (20)","Gain Energy"],
+                  }
+            } else if (move === "Touch"){
+                defender.hp -= 200
+                POKEMON_MOVES = {
+                     "Sean Diddy Combs": ["Take Home", "Potion (+25)","Tackle (20)","Gain Energy"],
+                }
+                logMessage(`${defender.name} got touched 🙉`);
+            } else if (move === "Monke Stare") {
+                defender.hp -= MOVE_DAMAGE[move] * this.bananapoint;
+                logMessage(`${this.name} monke! 🙉`);
+            } else if (move === "Eat Bananini") {
+                defender.hp = this.hp;
+                this.hp += 10 * this.bananapoint;
+                this.bananapoint += 1;
+                logMessage(`Bananini gains a banana and now has ${this.bananapoint} bananini points! 🍌`);
+                if (this.hp > MAX_HEALTH[this.name]) {
+                       this.hp = MAX_HEALTH[this.name]; }
+            } else if (move === "Patapower") {
+                this.patafied *= 2;
+                logMessage(`${this.name} Powered up! Patapunch will now do ${this.patafied} damage`);
+            } if (move === "Patapunch") {
+                defender.hp -= this.patafied;
+                logMessage(`${this.name} used its patapower to do ${this.patafied} damage!`);
+                this.patafied = 20;
+            } if (move === "Aura-drain") {
+                defender.hp -= MOVE_DAMAGE[move] * (1 + rizzedup);
+                logMessage(`${this.name} drained ${defender.name}'s aura doing ${MOVE_DAMAGE[move] * (1 + rizzedup)} damage!`);
+                rizzedup = 0;
+                rizzupdate();
+                defender.moves = POKEMON_MOVES[defender.name];
+            } if (move === "Rizz-up") {
+                defender.hp -= MOVE_DAMAGE[move];
+                rizzedup = 1;
+                rizzupdate();
+                defender.moves = POKEMON_MOVES[defender.name];
+                logMessage(`${this.name} rizzed up ${defender.name}!`);
+            } if (move === "Give the rizzler a kiss 😘") {
+                defender.hp += 20 
+            } else if (move === "Retreat") {
+                logMessage("Retreat move detected"); // Add this
+                handleRetreat();
+                console.log("After handleRetreat call"); // Add this
+            } else if (move === "Curry Dance(100)") {
+                defender.hp -= MOVE_DAMAGE[move];
+                logMessage(`${this.name} dances with Curry Dance! 🌶️`);
+            } else if (move === "Tackle (20)") {
+                defender.hp -= MOVE_DAMAGE[move] * this.buff;
+                logMessage(`${this.name} uses tackle!️`);
+            } else if (move === "JuicyTap") {
+                startJuicyJackCPS(async (damage) => {
+                    defender.hp -= damage;
+                    logMessage(`JuicyJack did ${damage} damage with pure JUICE! 🧃`);
+                    if (typeof update3v3HealthBars === "function") update3v3HealthBars();
+                    if (defender.hp <= 0) {
+                        defender.hp = 0;
+                        if (gameState.mode === "pvp" || gameState.mode === "cpu") {
+                            showPlayAgainModal(`${defender.name} fainted! ${this.name} wins! 🏆`);
+                            return;
+                        } else if (gameState.mode === "3v3") {
+                            if (gameState.player.hp <= 0) {
+                                await handle3v3Faint('player');
+                                
+                                return;
+                            }
+                            // THEN: Check if the opponent fainted
+                            if (gameState.opponent.hp <= 0) {
+                                await handle3v3Faint('opponent');
+                                this.seanstatus = 0;
+                                return;
+                            } else {
+                                // Fallback: log or switch to next Pokémon
+                                logMessage(`${defender.name} fainted! Switching to next Pokémon...`);
+                                // (Insert your 3v3 switch logic here)
+                            }
+                            return;
+                        }
+                    }
+            
+                    // Resume the main move flow so normal faint/switch/win logic runs:
+                    // If you want, you can call playerTurn() here instead, but not both.
+                    if (typeof playerTurn === "function") playerTurn();
+                });
+                return;
+            } else if (move === "SkibidiMath") {
+                // Start SkibidiMath mini-game
+                startSkibidiMath(async (numCorrect) => {
+                    const damage = 10 * numCorrect;
+                    defender.hp -= damage;
+                    logMessage(`Athubro did ${damage} damage with SkibidiMath! (${numCorrect} correct) 🧮`);
+            
+                    // Update health bars if the function is available
+                    if (typeof update3v3HealthBars === "function") update3v3HealthBars();
+            
+                    
+            
+                    // Handle fainting logic for defender
+                    if (defender.hp <= 0) {
+                        defender.hp = 0;
+            
+                        if (gameState.mode === "pvp" || gameState.mode === "cpu") {
+                            showPlayAgainModal(`${defender.name} fainted! ${this.name} wins! 🏆`);
+                            return;
+                        } else if (gameState.mode === "3v3") {
+                            if (gameState.player.hp <= 0) {
+                                // Player's Pokémon fainted
+                                const playerMovesDiv = document.getElementById("moves");
+                                if (playerMovesDiv) {
+                                    playerMovesDiv.innerHTML = "";
+                                    playerMovesDiv.style.display = "none";
+                                 await handle3v3Faint('player');
+                                 return;
+                                }
+                            } else if (gameState.opponent.hp <= 0) {
+                                // Opponent's Pokémon fainted
+                                const opponentMovesDiv = document.getElementById("opponent-moves");
+                                if (opponentMovesDiv) {
+                                    opponentMovesDiv.innerHTML = "";
+                                    opponentMovesDiv.style.display = "none";
+                                    await handle3v3Faint('opponent');
+                                    return;
+                                }
+                            } else {
+                                logMessage(`${defender.name} fainted! Switching to next Pokémon...`);
+                            }
+                            return;
+                        }
+                    }
+            
+                    // Proceed to the next turn (player's or opponent's)
+                    if (typeof playerTurn === "function") playerTurn();
+                });
+            
+                return;
+            } else if (move === "Gain Evolution Point") {
+                this.evopnt += 1;
+                logMessage("Akhilan gained 1 more evolution point 🌟");
+            } else if (move === "Gambling") {
+                const randomNumber = await showGamblingModal(this.name);
+                if (randomNumber === null) {
+                    logMessage("Invalid number! Try again. 😕");
+                    return "retry";
+                }
+                const number = Math.floor(Math.random() * 10) + 1;
+                const distance = Math.abs(number - randomNumber);
+                if (distance === 0) {
+                    defender.hp -= 200;
+                    logMessage(`Reid did 200 Damage! Number was: ${number} 🎰`);
+                } else if (distance <= 1) {
+                    defender.hp -= 80;
+                    logMessage(`Reid did 80 Damage! Number was: ${number} 🎲`);
+                } else if (distance <= 2) {
+                    defender.hp -= 50;
+                    logMessage(`Reid did 50 Damage! Number was: ${number} 🎯`);
+                } else if (distance <= 5) {
+                    defender.hp -= 20;
+                    logMessage(`Reid did 20 Damage! Number was: ${number} 😐`);
+                } else {
+                    logMessage(`Reid did nothing... Number was: ${number} 😔`);
+                }
+            } else if (move === "Matza (50)") {
+                defender.hp -= MOVE_DAMAGE[move];
+                logMessage(`${this.name} unleashes Matza! 🍞`);
+            } else if (move === "Latka (100)") {
+                defender.hp -= MOVE_DAMAGE[move];
+                logMessage(`${this.name} slams with Latka! 🥟`);
+            } else if (move === "Jack-Punch(50)") {
+                defender.hp -= 50 * this.buff;
+                this.buff = this.buff * 1.3;
+                logMessage("Jack's Ability Increased his atk by 30% 👊");
+            } else if (move === "Sammify (0 or 100)") {
+                if (Math.random() < 0.5) {
+                    defender.hp -= 100;
+                    logMessage("Your attack did 100 damage! 💪");
+                } else {
+                    logMessage("Your attack did nothing... 😞");
+                }
+            } else if (move === "Guo Explosion (85), 30 self Damage") {
+                defender.hp -= MOVE_DAMAGE[move];
+                this.hp -= MOVE_DAMAGE["Guo Explosion Self-Damage"];
+                logMessage(`${this.name} explodes with Guo Explosion! 💣`);
+            
+                // Clamp both HPs to zero
+                if (this.hp < 0) this.hp = 0;
+                if (defender.hp < 0) defender.hp = 0;
+            } else if (move === "RiceSlash (50)") {
+                defender.hp -= MOVE_DAMAGE[move];
+                if (this.hp <= 70) {
+                    defender.hp -= 50;
+                    logMessage("Brian's Ability Did 50 Extra Damage! 🍚");
+                }
+            } else if (move === "Energy Drain") {
+                // Check if we have enough energy (1) to use this mov
+                // Deduct the move's energy cost
+                this.energy -= ENERGY[move];
+                
+                updateEnergyDisplay();
+            
+                // Calculate how much we can steal (1-3, but can't take opponent below 0)
+                const stealAmount = Math.min(
+                    Math.floor(Math.random() * 3) + 1, // Random 1-3
+                    defender.energy // Can't take more than they have
+                );
+            
+                // Perform the energy transfer
+                defender.energy -= stealAmount;
+                this.energy += stealAmount;
+                updateEnergyDisplay();
+            
+                logMessage(`${this.name} stole ${stealAmount} energy from ${defender.name}! ⚡`);
+
+                return;
+            } else if (move === "Pika Bolt (70)") {
+                defender.hp -= MOVE_DAMAGE[move];
+                if (Math.random() < 0.5) {
+                    this.hp -= MOVE_DAMAGE["Repulsion"];
+                    logMessage(`${this.name}'s Pika Bolt rebounded and hurt itself! ⚡️`);
+                }
+            } else if (move === "Laurune Handout (60)") {
+                defender.hp -= MOVE_DAMAGE[move];
+                if (defender.name === "MicaManx") {
+                    defender.hp -= 50;
+                    logMessage("Laurune is Super Effective on MicaManx! 📚");
+                }
+            } else if (move === "Micah Slash (50)") {
+                if (defender.name === "Laurune") {
+                    defender.hp -= MOVE_DAMAGE[move] - 30;
+                    logMessage("MicaManx is not very effective... 😬");
+                } else if (this.ability) {
+                    defender.hp -= 100;
+                    logMessage("MicaManx Ability did 50 extra damage 🗡️");
+                } else {
+                    defender.hp -= MOVE_DAMAGE[move];
+                }
+            } else if (move === "Curry Splash (50)") {
+                defender.hp -= MOVE_DAMAGE[move];
+                logMessage(`${this.name} splashes with Curry Splash! 🍛`);
+            } else if (move === "Potion (+25)") {
+                this.hp += MOVE_DAMAGE[move];
+                if (this.hp > MAX_HEALTH[this.name]) {
+                    this.hp = MAX_HEALTH[this.name];
+                }
+                logMessage(`${this.name} used a Potion and healed! 🧪`);
+                if (this.name === "Rizzler"){
+                    rizzedup = 0;
+                    rizzupdate();
+                }
+                defender.moves = POKEMON_MOVES[defender.name];
+            } else if (move === "Meme Beam (50, 50% Paralyze)") {
+                const williMemes = [
+                    "https://static.wikia.nocookie.net/brainrotnew/images/6/60/Chimpanzini_Bananini_Priestini.jpg",
+                    "https://napoleoncat.com/wp-content/uploads/2022/05/social-media-memes-emotional-damage-meme.jpg",
+                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRd5nbYoLuSSxTmnGWK3AvBgT96I5O9q8DJCQ&s",
+                    
+                ];
+                const memeUrl = williMemes[Math.floor(Math.random() * williMemes.length)];
+                document.getElementById("meme-img").src = memeUrl;
+                await new Promise(resolve => {
+                    const modal = document.getElementById("meme-modal");
+                    modal.classList.remove("hidden");
+                    setTimeout(() => {
+                        modal.classList.add("hidden");
+                        resolve();
+                    }, 1700);
+                });
+                defender.hp -= MOVE_DAMAGE[move];
+                logMessage("<b>Willi-Bily fires the MEME BEAM!</b>");
+                if (Math.random() <= 0.3) {
+                    opponentStatus.value = "paralyzed";
+                    logMessage("It's super effective! <b>" + defender.name + " is paralyzed by memes! 😂⚡️</b>");
+                }
+            } else if (move === "ADHD (40)") {
+                defender.hp -= MOVE_DAMAGE[move];
+                logMessage(`${this.name} attacks with ADHD! 🤯`);
+            }
+            if (this.name === "Akhilan" && this.evopnt >= 3) {
+                this.name = "AkhilApe";
+                this.hp = MAX_HEALTH["AkhilApe"];
+                this.moves = POKEMON_MOVES["AkhilApe"];
+                this.used_paralyze = false;
+                this.ability = false;
+                this.buff = 1.0;
+                showEventToast("Yay! You evolved into AKHILAPE 🦍", 2000);
+            }
+            if (this.name === "Sean Diddy Combs") {
+                if(this.seanstatus === 0){
+                  POKEMON_MOVES = {
+                     "Sean Diddy Combs": ["Take Home", "Potion (+25)","Tackle (20)","Gain Energy"],
+                  }
+                }else if (this.seanstatus === 1){
+                  
+                  POKEMON_MOVES = {
+                     "Sean Diddy Combs": ["Oil Up", "Potion (+25)","Tackle (20)","Gain Energy"],
+                  }
+                }else if  (this.seanstatus === 2){
+                  POKEMON_MOVES = {
+                     "Sean Diddy Combs": ["Touch", "Potion (+25)","Tackle (20)", "Gain Energy"],
+                  }
+                this.moves = POKEMON_MOVES[this.name];
+                
+            }
+            }
+            
+            return "success";
+        }
+    }
+    class SimpleCPU {
+        constructor(name) {
+            this.name = name === "Tag Team Jillian and Maya" ? "Maya" : name;
+            this.hp = MAX_HEALTH[this.name];
+            this.moves = POKEMON_MOVES[this.name];
+            this.used_paralyze = false;
+            this.ability = false;
+            this.use_potion_threshold = 30;
+            this.buff = 1;
+            this.evolvl = EVO_LEVEL[name] || 0;
+            this.evopnt = 0;
+            this.speed = SPEED[this.name];
+            this.bananapoint = 1;
+            rizzedup=0
+            this.patafied = 20;
+            this.energy = 0; // Initialize energy to 0
+        }
+        applyMove(move, defender, playerStatus, cpuStatus) {
+            if (ENERGY[move] > this.energy) {
+                logMessage(`${this.name} doesn't have enough energy to use ${move}!`);
+                return "retry";
+            }
+    
+            // Deduct energy for the move
+            if (ENERGY[move] > 0) {
+                this.energy -= 1;
+                    updateEnergyDisplay(); // Update the energy display on the UI
+            }
+
+            if (move === "Gain Energy") {
+                this.energy += 1; // Increment energy
+                logMessage(`${this.name} gained 1 energy! 🔋`);
+                if (this.name === "Rizzler"){
+                  rizzedup = 0;
+                  rizzupdate();
+                  defender.moves = POKEMON_MOVES[defender.name];
+                }
+                
+                updateEnergyDisplay();
+                return;
+            }
+            if (this.name === "MicaManx") {
+                if (Math.random() < 0.5) {
+                    this.hp -= 20;
+                    logMessage("MicaManx's Ability lost him 20 health! 😣");
+                    this.ability = false;
+                } else {
+                    this.ability = true;
+                }
+            }
+            if (this.name === "Akhilan") {
+                this.evopnt += 1;
+                logMessage("Akhilan's Ability granted him one more point 🌟");
+            }
+            if (cpuStatus.value === "paralyzed") {
+                logMessage(`${this.name} is paralyzed and can't move! ⚡️`);
+                cpuStatus.value = "well";
+                return;
+            }
+            if (move === "Kuhn Quiz (Paralyze + 30)") {
+                if (this.used_paralyze) return;
+                defender.hp -= MOVE_DAMAGE[move];
+                playerStatus.value = "paralyzed";
+                logMessage(`${defender.name} is paralyzed! ⚡️`);
+                this.used_paralyze = true;
+            } else if (move === "Guo Blast (50)") {
+                defender.hp -= MOVE_DAMAGE[move];
+                logMessage(`${this.name} blasts with Guo Blast! 💥`);
+            } else if (move === "Monke Stare") {
+                defender.hp -= MOVE_DAMAGE[move] * this.bananapoint;
+                logMessage(`${this.name} monke! 🙉`);
+            } else if (move === "Eat Bananini") {
+                defender.hp = this.hp;
+                this.hp += 10 * this.bananapoint;
+                this.bananapoint += 1;
+                logMessage(`Bananini gains a banana and now has ${this.bananapoint} bananini points! 🍌`);
+                if (this.hp > MAX_HEALTH[this.name]) {
+                       this.hp = MAX_HEALTH[this.name]; }
+            } else if (move === "Patapower") {
+                this.patafied *= 2;
+                logMessage(`${this.name} Powered up! Patapunch will now do ${this.patafied} damage`);
+            } if (move === "Patapunch") {
+                defender.hp -= this.patafied;
+                logMessage(`${this.name} used its patapower to do ${this.patafied} damage!`);
+                this.patafied = 20;
+            } if (move === "Aura-drain") {
+                defender.hp -= MOVE_DAMAGE[move] * (1 + rizzedup);
+                logMessage(`${this.name} drained ${defender.name}'s aura doing ${MOVE_DAMAGE[move] * (1 + rizzedup)} damage!`);
+                rizzedup = 0;
+                rizzupdate();
+                defender.moves = POKEMON_MOVES[defender.name];
+            } if (move === "Rizz-up") {
+                defender.hp -= MOVE_DAMAGE[move];
+                rizzedup = 1;
+                rizzupdate();
+                defender.moves = POKEMON_MOVES[defender.name];
+                logMessage(`${this.name} rizzed uo ${defender.name}!`);
+            } if (move === "Give the rizzler a kiss 😘") {
+                defender.hp += 20;
+                if (this.hp > MAX_HEALTH[this.name]) {
+                    this.hp = MAX_HEALTH[this.name];
+                }
+            } else if (move === "Gain Evolution Point") {
+                this.evopnt += 1;
+                logMessage("Akhilan gained 1 more evolution point 🌟");
+            } else if (move === "Energy Drain") {
+            
+                // Check if we have enough energy (1) to use this move
+                if (ENERGY[move] > this.energy) {
+                    logMessage(`${this.name} doesn't have enough energy to use ${move}!`);
+                    return "retry";
+                }
+            
+                // Deduct the move's energy cost
+                this.energy -= ENERGY[move];
+                updateEnergyDisplay();
+            
+                // Calculate how much we can steal (1-3, but can't take opponent below 0)
+                const stealAmount = Math.min(
+                    Math.floor(Math.random() * 3) + 1, // Random 1-3
+                    defender.energy // Can't take more than they have
+                );
+            
+                // Perform the energy transfer
+                defender.energy -= stealAmount;
+                this.energy += stealAmount;
+                updateEnergyDisplay();
+            
+                logMessage(`${this.name} stole ${stealAmount} energy from ${defender.name}! ⚡`);
+                return;
+            } else if (move === "Gambling") {
+                const randomNumber = Math.floor(Math.random() * 10) + 1;
+                logMessage(`CPU chose ${randomNumber} for Gambling`);
+                const number = Math.floor(Math.random() * 10) + 1;
+                const distance = Math.abs(number - randomNumber);
+                if (distance === 0) {
+                    defender.hp -= 200;
+                    logMessage(`Reid did 200 Damage! Number was: ${number} 🎰`);
+                } else if (distance <= 1) {
+                    defender.hp -= 80;
+                    logMessage(`Reid did 80 Damage! Number was: ${number} 🎲`);
+                } else if (distance <= 2) {
+                    defender.hp -= 50;
+                    logMessage(`Reid did 50 Damage! Number was: ${number} 🎯`);
+                } else if (distance <= 5) {
+                    defender.hp -= 20;
+                    logMessage(`Reid did 20 Damage! Number was: ${number} 😐`);
+                } else {
+                    logMessage(`Reid did nothing... Number was: ${number} 😔`);
+                }
+            } else if (move === "Matza (50)") {
+                defender.hp -= MOVE_DAMAGE[move];
+                logMessage(`${this.name} unleashes Matza! 🍞`);
+            } else if (move === "Tackle (20)") {
+                defender.hp -= MOVE_DAMAGE[move] * this.buff;
+                logMessage(`${this.name} uses tackle!️`);
+            } else if (move === "Latka (100)") {
+                defender.hp -= MOVE_DAMAGE[move];
+                logMessage(`${this.name} slams with Latka! 🥟`);
+            } else if (move === "Jack-Punch(50)") {
+                defender.hp -= 50 * this.buff;
+                this.buff += 0.25;
+                logMessage("Jack's Ability Increased his atk by 25% 👊");
+            } else if (move === "Sammify (0 or 100)") {
+                if (Math.random() < 0.5) {
+                    defender.hp -= 100;
+                    logMessage("The attack did 100 damage! 💪");
+                } else {
+                    logMessage("The attack did nothing 😞");
+                }
+            } else if (move === "Guo Explosion (85), 30 self Damage") {
+                defender.hp -= MOVE_DAMAGE[move];
+                this.hp -= MOVE_DAMAGE["Guo Explosion Self-Damage"];
+                logMessage(`${this.name} explodes with Guo Explosion! 💣`);
+            
+                // Clamp both HPs to zero
+                if (this.hp < 0) this.hp = 0;
+                if (defender.hp < 0) defender.hp = 0;
+            } else if (move === "RiceSlash (50)") {
+                defender.hp -= MOVE_DAMAGE[move];
+                if (this.hp <= 70) {
+                    defender.hp -= 50;
+                    logMessage("Brian's Ability Did 50 Extra Damage! 🍚");
+                }
+            } else if (move === "Pika Bolt (70)") {
+                defender.hp -= MOVE_DAMAGE[move];
+                if (Math.random() < 0.5) {
+                    this.hp -= MOVE_DAMAGE["Repulsion"];
+                    logMessage(`${this.name}'s Pika Bolt rebounded and hurt itself! ⚡️`);
+                }
+            } else if (move === "Laurune Handout (60)") {
+                defender.hp -= MOVE_DAMAGE[move];
+                if (defender.name === "MicaManx") {
+                    defender.hp -= 50;
+                    logMessage("Laurune is Super Effective on MicaManx! 📚");
+                }
+            } else if (move === "Micah Slash (50)") {
+                if (defender.name === "Laurune") {
+                    defender.hp -= MOVE_DAMAGE[move] - 30;
+                    logMessage("MicaManx is not very effective... 😬");
+                } else if (this.ability) {
+                    defender.hp -= 100;
+                    logMessage("MicaManx Ability did 50 extra damage 🗡️");
+                } else {
+                    defender.hp -= MOVE_DAMAGE[move];
+                }
+            } else if (move === "Curry Splash (50)") {
+                defender.hp -= MOVE_DAMAGE[move];
+                logMessage(`${this.name} splashes with Curry Splash! 🍛`);
+            } else if (move === "Potion (+25)") {
+                this.hp += MOVE_DAMAGE[move];
+                if(this.name === "Rizzler"){
+                      rizzedup = 0;
+                      rizzupdate();
+                      defender.moves = POKEMON_MOVES[defender.name];
+                }
+                
+                if (this.hp > MAX_HEALTH[this.name]) {
+                    this.hp = MAX_HEALTH[this.name];
+                }
+                logMessage(`${this.name} used a Potion and healed! 🧪`);
+            } else if (move === "Meme Beam (50, 50% Paralyze)") {
+                const williMemes = [
+                   "https://static.wikia.nocookie.net/brainrotnew/images/6/60/Chimpanzini_Bananini_Priestini.jpg",
+                   "https://cdn-0001.qstv.on.epicgames.com/xaYoZfhWBCGAeMkIfk/image/landscape_comp.jpeg",
+                   "https://napoleoncat.com/wp-content/uploads/2022/05/social-media-memes-emotional-damage-meme.jpg",
+      
+                ];
+                const memeUrl = williMemes[Math.floor(Math.random() * williMemes.length)];
+                logMessage("<b>Willi-Bily fires the MEME BEAM!</b> <img src='" + memeUrl + "' style='height:80px;vertical-align:middle;border-radius:12px;box-shadow:0 2px 12px #aaa;'>");
+                defender.hp -= MOVE_DAMAGE[move];
+                if (Math.random() <= 0.3) {
+                    playerStatus.value = "paralyzed";
+                    logMessage("It's super effective! <b>" + defender.name + " is paralyzed by memes! 😂⚡️</b>");
+                }
+            } else if (move === "ADHD (40)") {
+                defender.hp -= MOVE_DAMAGE[move];
+                logMessage(`${this.name} attacks with ADHD! 🤯`);
+            }
+        }
+        chooseAction() {
+                // First filter for moves the CPU can afford
+                const affordableMoves = this.moves.filter(move => {
+                    const energyCost = ENERGY[move] || 0;
+                    return this.energy >= energyCost;
+                });
+            
+                // If no moves can be used, return null
+               
+            
+                // Check if we should use Potion (only if both below threshold AND can afford it)
+                const canUsePotion = this.hp < this.use_potion_threshold && 
+                                     affordableMoves.includes("Potion (+25)");
+            
+                if (canUsePotion) {
+                    return "Potion (+25)";
+                }
+            
+                // Otherwise choose randomly from remaining affordable moves
+                const nonPotionMoves = affordableMoves.filter(m => m !== "Potion (+25)");
+                
+                // If only Potion was affordable but we're above threshold, return null
+                if (nonPotionMoves.length === 0) {
+                    return null;
+                }
+            
+                return nonPotionMoves[Math.floor(Math.random() * nonPotionMoves.length)];
+            
+        }
+    }
+
+    // --- GAME STATE ---
+    let gameState = {
+        mode: null,
+        player: null,
+        opponent: null,
+        playerStatus: { value: "well" },
+        opponentStatus: { value: "well" },
+        whoGoesFirst: null,
+        selectingFor: null,
+        turn: null
+    };
+
+    // --- UI FUNCTIONS ---
+    function logMessage(message) {
+        const log = document.getElementById("battle-log");
+        
+        // Clear any previous messages
+        while (log.firstChild) {
+            log.removeChild(log.firstChild);
+        }
+        
+        // Add new message
+        const messageElement = document.createElement("div");
+        messageElement.className = "current-message";
+        messageElement.textContent = `📢 ${message}`;
+        log.appendChild(messageElement);
+        
+        // Auto-scroll to ensure visibility
+        log.scrollTop = log.scrollHeight;
+    }
+   
+    function updateHealthBars() {
+        // 3v3 EXCEPTION: Use current player's maxHp, not MAX_HEALTH dict
+        if (gameState.mode === '3v3') {
+            const player = gameState.player;
+            const opponent = gameState.opponent;
+            document.getElementById("player-name").textContent = player.name;
+            document.getElementById("opponent-name").textContent = opponent.name;
+            document.getElementById("player-hp").textContent = `${Math.max(0, player.hp)}/${player.maxHp}`;
+            document.getElementById("opponent-hp").textContent = `${Math.max(0, opponent.hp)}/${opponent.maxHp}`;
+            document.getElementById("player-health-bar").style.width = `${(player.hp / player.maxHp) * 100}%`;
+            document.getElementById("opponent-health-bar").style.width = `${(opponent.hp / opponent.maxHp) * 100}%`;
+            updateMoves();
+            return;
+        }
+        // Default for other modes
+        const player = gameState.player;
+        const opponent = gameState.opponent;
+        document.getElementById("player-name").textContent = player.name;
+        document.getElementById("opponent-name").textContent = opponent.name;
+        document.getElementById("player-hp").textContent = `${Math.max(0, player.hp)}/${MAX_HEALTH[player.name]}`;
+        document.getElementById("opponent-hp").textContent = `${Math.max(0, opponent.hp)}/${MAX_HEALTH[opponent.name]}`;
+        document.getElementById("player-health-bar").style.width = `${(player.hp / MAX_HEALTH[player.name]) * 100}%`;
+        document.getElementById("opponent-health-bar").style.width = `${(opponent.hp / MAX_HEALTH[opponent.name]) * 100}%`;
+        updateMoves();
+    }
+    function updateMoves() {
+        console.log("updateMoves function called");
+    
+        const playerMoves = document.getElementById("moves");
+        if (!playerMoves) {
+            console.error("Player Moves Container not found in DOM!");
+            return;
+        }
+        playerMoves.innerHTML = "";
+    
+        // Only show moves if it's the player's turn
+        if ((gameState.mode === "cpu" && gameState.whoGoesFirst === "player") || 
+            (gameState.mode === "pvp" && gameState.whoGoesFirst === "player1")) {
+            gameState.player.moves.forEach((move) => {
+                const btn = document.createElement("button");
+                btn.className = "move-btn";
+    
+                // Get the energy cost for the move
+                const energyCost = ENERGY[move] || 0;
+                console.log(`Move: "${move}", Energy Cost: ${energyCost}`);
+    
+                // Display the move name with energy cost
+                btn.innerHTML = `${move} <span style="color: #ffcb05;">⚡${energyCost}</span>`;
+                console.log("Button HTML:", btn.innerHTML);
+    
+                // Disable button if not enough energy
+                if (energyCost > gameState.player.energy) {
+                    btn.disabled = true;
+                    btn.style.opacity = "0.5"; // Grey out the button
+                    btn.style.cursor = "not-allowed";
+                    console.log(`Disabling Button for Move: "${move}"`);
+                } else {
+                    btn.disabled = false;
+                    btn.style.opacity = "1"; // Restore button appearance
+                    btn.style.cursor = "pointer";
+                }
+    
+                // Handle move selection
+                btn.onclick = () => selectMove(move);
+                playerMoves.appendChild(btn);
+            });
+        }
+    }
+    function updateAvatars() {
+        if (gameState.player && POKEMON_ICONS[gameState.player.name]) {
+            document.getElementById("player-avatar").src = POKEMON_ICONS[gameState.player.name];
+        }
+        if (gameState.opponent && POKEMON_ICONS[gameState.opponent.name]) {
+            document.getElementById("opponent-avatar").src = POKEMON_ICONS[gameState.opponent.name];
+        }
+    }
+    function showSelectionModal(player) {
+        const modal = document.getElementById("selection-modal");
+        document.getElementById("selection-title").textContent = `Choose ${player}'s Pokémon`;
+        const list = document.getElementById("pokemon-list");
+        list.innerHTML = "";
+        Object.keys(MAX_HEALTH).slice(0, 17).forEach(pokemon => {
+            const btn = document.createElement("button");
+            btn.className = "pokemon-btn";
+            btn.textContent = pokemon;
+            btn.onclick = () => selectPokemon(pokemon);
+            list.appendChild(btn);
+        });
+        showModal('selection-modal');
+        document.getElementById('selection-cancel').onclick = function() {
+            hideModal('selection-modal');
+            document.getElementById('homepage').classList.remove('hidden');
+        };
+    }
+    
+    function selectPokemon(pokemon) {
+        if (gameState.selectingFor === "player" || gameState.selectingFor === "player1") {
+            gameState.player = new Player(pokemon);
+            if (gameState.mode === "pvp") {
+                gameState.selectingFor = "player2";
+                showSelectionModal("Player 2"); // Show modal for Player 2
+                return; // Do not hide modal yet
+            } else {
+                gameState.selectingFor = "opponent";
+                const cpuPokemon = CPU_POKEMON.filter(p => p !== pokemon)[Math.floor(Math.random() * (CPU_POKEMON.length - 1))];
+                gameState.opponent = new SimpleCPU(cpuPokemon);
+                startBattle();
+            }
+        } else if (gameState.selectingFor === "player2") {
+            gameState.opponent = new Player(pokemon);
+            startBattle();
+        }
+        hideModal('selection-modal');
+    }
+    async function showGamblingModal(playerName) {
+        return new Promise(resolve => {
+            const modal = document.getElementById("gambling-modal");
+            document.getElementById("gambling-player").textContent = playerName;
+            document.getElementById("gambling-input").value = "";
+            showModal('gambling-modal');
+            const submitBtn = document.getElementById("gambling-submit");
+            const submitHandler = () => {
+                const value = parseInt(document.getElementById("gambling-input").value);
+                hideModal('gambling-modal');
+                submitBtn.removeEventListener("click", submitHandler);
+                if (isNaN(value) || value < 1 || value > 10) {
+                    resolve(null);
+                } else {
+                    resolve(value);
+                }
+            };
+            submitBtn.addEventListener("click", submitHandler);
+        });
+    }
+    async function selectMove(move) {
+        if (gameState.mode === "pvp") {
+            if (gameState.whoGoesFirst === "player1") {
+                logMessage(`${gameState.player.name} used ${move}!`);
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                const result = await gameState.player.applyMove(move, gameState.opponent, gameState.opponentStatus, gameState.playerStatus);
+                if (result === "retry") return;
+                updateHealthBars();
+                if (gameState.opponent.hp <= 0) {
+                    if (gameState.opponent.name === "Maya") {
+                        gameState.opponent.hp = MAX_HEALTH["Jillian"];
+                        gameState.opponent.name = "Jillian";
+                        gameState.opponent.moves = POKEMON_MOVES["Jillian"];
+                        logMessage("Jillian Spawned from the Tag Team 🤝");
+                        updateHealthBars();
+                    } else {
+                        showPlayAgainModal(`${gameState.opponent.name} fainted! ${gameState.player.name} wins! 🏆`);
+                        return;
+                    }
+                }
+                gameState.whoGoesFirst = "player2";
+                logMessage("\n--- Player 2 Turn ---");
+                updateHealthBars();
+            } else {
+                logMessage(`${gameState.opponent.name} used ${move}!`);
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                const result = await gameState.opponent.applyMove(move, gameState.player, gameState.playerStatus, gameState.opponentStatus);
+                if (result === "retry") return;
+                updateHealthBars();
+                if (gameState.player.hp <= 0) {
+                    if (gameState.player.name === "Maya") {
+                        gameState.player.hp = MAX_HEALTH["Jillian"];
+                        gameState.player.name = "Jillian";
+                        gameState.player.moves = POKEMON_MOVES["Jillian"];
+                        logMessage("Jillian Spawned from the Tag Team 🤝");
+                        updateHealthBars();
+                    } else {
+                        showPlayAgainModal(`${gameState.player.name} fainted! ${gameState.opponent.name} wins! 🏆`);
+                        return;
+                    }
+                }
+                gameState.whoGoesFirst = "player1";
+                logMessage("\n--- Player 1 Turn ---");
+                updateHealthBars();
+            }
+        } else {
+            logMessage(`${gameState.player.name} used ${move}!`);
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            await gameState.player.applyMove(move, gameState.opponent, gameState.opponentStatus, gameState.playerStatus);
+            updateHealthBars();
+
+            if (gameState.player.hp <= 0) {
+                showPlayAgainModal(`${gameState.player.name} fainted! ${gameState.opponent.name} wins! 🏆`);
+                return;
+            }
+
+            if (gameState.opponent.hp <= 0) {
+                if (gameState.opponent.name === "Maya") {
+                    gameState.opponent.hp = MAX_HEALTH["Jillian"];
+                    gameState.opponent.name = "Jillian";
+                    gameState.opponent.moves = POKEMON_MOVES["Jillian"];
+                    logMessage("Jillian Spawned from the Tag Team 🤝");
+                    updateHealthBars();
+                } else {
+                    showPlayAgainModal(`${gameState.opponent.name} fainted! ${gameState.player.name} wins! 🏆`);
+                    return;
+                }
+            }
+
+            // CPU's turn
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            logMessage("\n--- CPU's Turn ---");
+            const cpuMove = gameState.opponent.chooseAction();
+            await gameState.opponent.applyMove(cpuMove, gameState.player, gameState.playerStatus, gameState.opponentStatus);
+            updateHealthBars();
+
+            if (gameState.player.hp <= 0) {
+                showPlayAgainModal(`${gameState.player.name} fainted! ${gameState.opponent.name} wins! 🏆`);
+                return;
+            }
+
+            logMessage("\n--- Your Turn ---");
+            updateMoves();
+        }
+    }
+    async function startBattle() {
+        updateAvatars();
+        document.getElementById("game-container").className = "hidden";
+        showVsCutscene(gameState.player.name, gameState.opponent.name, async () => {
+            document.getElementById("game-container").className = "";
+            logMessage(`⚔️ ${gameState.player.name} vs ${gameState.opponent.name}! Battle starts!`);
+            updateEnergyDisplay(); // Show energy boxes when battle starts
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (gameState.mode === "cpu") {
+                gameState.whoGoesFirst = Math.random() < 0.5 ? "player" : "cpu";
+                updateHealthBars();
+                const firstName = gameState.whoGoesFirst === "player" ? gameState.player.name : "CPU";
+                showWhoGoesFirst(firstName, () => {
+                    if (gameState.whoGoesFirst === "player") {
+                        showMoves(gameState.player, async (move) => {
+                            await applyMove(gameState.player, gameState.opponent, move, "player");
+                        });
+                    } else {
+                        cpuTurn();
+                    }
+                });
+            } else if (gameState.mode === "pvp") {
+                gameState.turn = Math.random() < 0.5 ? 1 : 2;
+                updateHealthBars();
+                const firstName = gameState.turn === 1 ? gameState.player.name : gameState.opponent.name;
+                showWhoGoesFirst(firstName, async () => {
+                    await playerTurn();
+                });
+            }
+        });
+    }
+
+    async function cpuTurn() {
+        logMessage("\n--- CPU's Turn ---");
+        updateHealthBars();
+        await new Promise(resolve => setTimeout(resolve, 1250));
+        const cpuMove = gameState.opponent.chooseAction();
+        await new Promise(resolve => setTimeout(resolve, 1250));
+        await applyMove(gameState.opponent, gameState.player, cpuMove, "cpu");
+        await playerTurn();
+    }
+
+    async function applyMove(player, defender, move, playerType) {
+        if (playerType === "player") {
+            logMessage(`${player.name} used ${move}!`);
+        } else {
+            logMessage(`${player.name} used ${move}!`);
+        }
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        const result = await player.applyMove(move, defender, defender === gameState.player ? gameState.playerStatus : gameState.opponentStatus, player === gameState.player ? gameState.playerStatus : gameState.opponentStatus);
+        if (result === "retry") return;
+        updateHealthBars();
+
+        if (player.hp <= 0) {
+            showPlayAgainModal(`${player.name} fainted! ${defender.name} wins! 🏆`);
+            return;
+        }
+
+        if (defender.hp <= 0) {
+            if (defender.name === "Maya") {
+                defender.hp = MAX_HEALTH["Jillian"];
+                defender.name = "Jillian";
+                defender.moves = POKEMON_MOVES["Jillian"];
+                logMessage("Jillian Spawned from the Tag Team 🤝");
+                updateHealthBars();
+            } else {
+                showPlayAgainModal(`${defender.name} fainted! ${player.name} wins! 🏆`);
+                return;
+            }
+        }
+
+        // --- CPU vs Player: alternate automatically ---
+        if (gameState.mode === "cpu" && playerType === "player" && defender.hp > 0 && player.hp > 0) {
+            await cpuTurn();
+        } else if (gameState.mode === "cpu" && playerType === "cpu" && defender.hp > 0 && player.hp > 0) {
+            // After CPU's move, prompt player for next move
+            showMoves(gameState.player, async (nextMove) => {
+                await applyMove(gameState.player, gameState.opponent, nextMove, "player");
+            });
+        }
+    }
+
+    function showPlayAgainModal(message) {
+        document.getElementById("play-again-message").textContent = message;
+        showModal('play-again-modal');
+    }
+    function playAgain(yes) {
+        hideModal('play-again-modal');
+        document.getElementById("battle-log").innerHTML = "";
+        document.getElementById("moves").innerHTML = "";
+        document.getElementById("opponent-moves").innerHTML = "";
+        document.getElementById("moves").style.display = "none";
+        document.getElementById("opponent-moves").style.display = "none";
+        // Reset HP bars and any damage counters
+        const playerHpBar = document.getElementById("player-hp-bar");
+        const opponentHpBar = document.getElementById("opponent-hp-bar");
+        if (playerHpBar) playerHpBar.style.width = "100%";
+        if (opponentHpBar) opponentHpBar.style.width = "100%";
+        // Reset game state
+        if (yes) {
+            document.getElementById("game-container").className = "hidden";
+            document.getElementById("homepage").className = "";
+            gameState = {
+                mode: null,
+                player: null,
+                opponent: null,
+                playerStatus: { value: "well" },
+                opponentStatus: { value: "well" },
+                whoGoesFirst: null,
+                selectingFor: null,
+                turn: null
+            };
+        } else {
+            document.getElementById("game-container").className = "hidden";
+            document.getElementById("homepage").className = "";
+            logMessage("Thanks for playing! 👋");
+        }
+    }
+    // Utility to show/hide modals safely
+    function showModal(id) {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('show');
+        }
+    }
+    function hideModal(id) {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('show');
+        }
+    }
+    // Modal overlay click-to-close (for debugging stuck modals)
+    ["selection-modal", "play-again-modal", "gambling-modal", "vs-cutscene", "coinflip-modal"].forEach(id => {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.addEventListener("click", function(e) {
+                if (e.target === modal) {
+                    hideModal(id);
+                }
+            });
+        }
+    });
+    // --- BUTTON EVENT LISTENERS ---
+    const pvpBtn = document.getElementById("pvp-btn");
+    const cpuBtn = document.getElementById("cpu-btn");
+    pvpBtn.addEventListener("click", () => {
+        // Reset 3v3-specific state/UI
+        if (document.getElementById('player-team-box')) document.getElementById('player-team-box').style.display = 'none';
+        if (document.getElementById('opponent-team-box')) document.getElementById('opponent-team-box').style.display = 'none';
+        if (document.getElementById('draft-modal')) document.getElementById('draft-modal').classList.add('hidden');
+        gameState.teams = undefined;
+        gameState.active = undefined;
+        gameState.mode = "pvp";
+        document.getElementById("homepage").className = "hidden";
+        showSelectionModal("Player 1");
+        gameState.selectingFor = "player1";
+    });
+    cpuBtn.addEventListener("click", () => {
+        // Reset 3v3-specific state/UI
+        if (document.getElementById('player-team-box')) document.getElementById('player-team-box').style.display = 'none';
+        if (document.getElementById('opponent-team-box')) document.getElementById('opponent-team-box').style.display = 'none';
+        if (document.getElementById('draft-modal')) document.getElementById('draft-modal').classList.add('hidden');
+        gameState.teams = undefined;
+        gameState.active = undefined;
+        gameState.mode = "cpu";
+        document.getElementById("homepage").className = "hidden";
+        showSelectionModal("Player");
+        gameState.selectingFor = "player";
+    });
+    const playAgainYes = document.getElementById("play-again-yes");
+    const playAgainNo = document.getElementById("play-again-no");
+    playAgainYes.addEventListener("click", () => playAgain(true));
+    playAgainNo.addEventListener("click", () => playAgain(false));
+
+    document.getElementById('triple-btn').addEventListener('click', function() {
+        // Hide homepage, show draft UI (to be implemented)
+        document.getElementById('homepage').classList.add('hidden');
+        // Placeholder: Show alert, implement draft modal next
+        startDraftMode();
+    });
+
+    function showMoves(playerObj, onMoveSelected) {
+        const movesDiv = playerObj === gameState.player 
+            ? document.getElementById("moves") 
+            : document.getElementById("opponent-moves");
+        
+        movesDiv.innerHTML = "";
+        movesDiv.style.display = ""; 
+        
+        playerObj.moves.forEach(move => {
+            const btn = document.createElement("button");
+            btn.className = "move-btn";
+            const energyCost = ENERGY[move] || 0;
+            btn.innerHTML = `<span class='icon'>🎯</span> ${move} <span style="color: #ffcb05;">⚡${energyCost}</span>`;
+            
+            if (energyCost > playerObj.energy) {
+                btn.disabled = true;
+                btn.style.opacity = "0.5";
+            }
+            
+            btn.onclick = () => {
+                movesDiv.innerHTML = "";
+                movesDiv.style.display = "none";
+                onMoveSelected(move);
+            };
+            
+            movesDiv.appendChild(btn);
+        });
+    
+        const otherMovesDiv = playerObj === gameState.player 
+            ? document.getElementById("opponent-moves") 
+            : document.getElementById("moves");
+        
+        otherMovesDiv.innerHTML = "";
+        otherMovesDiv.style.display = "none";
+    }
+
+    async function playerTurn() {
+        if (gameState.mode === "pvp") {
+            if (gameState.turn === 1) {
+                showMoves(gameState.player, async (move) => {
+                    await applyMove(gameState.player, gameState.opponent, move, "player1");
+                    if (gameState.opponent.hp > 0 && gameState.player.hp > 0) {
+                        gameState.turn = 2;
+                        await playerTurn();
+                    }
+                });
+            } else {
+                showMoves(gameState.opponent, async (move) => {
+                    await applyMove(gameState.opponent, gameState.player, move, "player2");
+                    if (gameState.opponent.hp > 0 && gameState.player.hp > 0) {
+                        gameState.turn = 1;
+                        await playerTurn();
+                    }
+                });
+            }
+        }
+    }
+
+    function showVsCutscene(left, right, callback) {
+        const vsModal = document.getElementById("vs-cutscene");
+        const leftSpan = document.getElementById("vs-left");
+        const rightSpan = document.getElementById("vs-right");
+        const vsSpan = document.getElementById("vs-vs");
+        leftSpan.textContent = left;
+        rightSpan.textContent = right;
+        // Restart animation classes
+        leftSpan.classList.remove("vs-bounce");
+        rightSpan.classList.remove("vs-bounce");
+        vsSpan.classList.remove("vs-shake");
+        void leftSpan.offsetWidth; // Force reflow
+        void rightSpan.offsetWidth;
+        void vsSpan.offsetWidth;
+        leftSpan.classList.add("vs-bounce");
+        rightSpan.classList.add("vs-bounce");
+        vsSpan.classList.add("vs-shake");
+        vsModal.classList.remove("hidden");
+        vsModal.classList.add("show");
+        setTimeout(() => {
+            vsModal.classList.add("hidden");
+            vsModal.classList.remove("show");
+            if (callback) callback();
+        }, 1800);
+    }
+
+    function showCoinFlip(callback) {
+        const modal = document.getElementById("coinflip-modal");
+        const img = document.getElementById("coinflip-gif");
+        const resultDiv = document.getElementById("coinflip-result");
+        modal.classList.remove("hidden");
+        resultDiv.textContent = "";
+        // Randomly pick heads or tails
+        const heads = Math.random() < 0.5;
+        let gifUrl, resultText;
+        if (heads) {
+            gifUrl = "https://media.tenor.com/nEu74vu_sT4AAAAM/heads-coinflip.gif";
+            resultText = "Heads! Player goes first.";
+        } else {
+            gifUrl = "https://media.tenor.com/nvdwR9p4v5kAAAAM/heads-or-tail-tails.gif";
+            resultText = "Tails! CPU goes first.";
+        }
+        img.src = ""; // Reset first
+        setTimeout(() => {
+            img.src = gifUrl;
+            resultDiv.textContent = resultText;
+            console.log('Set coinflip gif src to:', gifUrl);
+        }, 100); // Give DOM a moment to update
+        setTimeout(() => {
+            modal.classList.add("hidden");
+            callback(heads);
+        }, 1800);
+    }
+
+    const origStartBattle = window.startBattle;
+    window.startGame = function() {
+        // Randomly pick either player or cpu to go first
+        const whoFirst = Math.random() < 0.5 ? 'player' : 'cpu';
+        gameState.whoGoesFirst = whoFirst;
+        // Show big text for who goes first
+        const vsModal = document.getElementById("vs-cutscene");
+        const leftSpan = document.getElementById("vs-left");
+        const rightSpan = document.getElementById("vs-right");
+        const vsSpan = document.getElementById("vs-vs");
+        leftSpan.textContent = whoFirst === 'player' ? gameState.player.name : gameState.opponent.name;
+        rightSpan.textContent = whoFirst === 'player' ? gameState.opponent.name : gameState.player.name;
+        vsSpan.textContent = 'GOES FIRST!';
+        vsSpan.style.fontSize = '2em';
+        vsSpan.style.color = '#ffcb05';
+        vsSpan.style.textShadow = '2px 2px 12px #3b4cca, 0 0 10px #fff';
+        vsModal.classList.remove("hidden");
+        vsModal.classList.add("show");
+        setTimeout(() => {
+            vsModal.classList.add("hidden");
+            vsModal.classList.remove("show");
+            // Restore VS text
+            vsSpan.textContent = 'VS';
+            vsSpan.style.fontSize = '';
+            vsSpan.style.color = '';
+            vsSpan.style.textShadow = '';
+            origStartBattle();
+        }, 1800);
+    };
+
+    function showEventToast(message, duration=1800) {
+        const toast = document.getElementById('event-toast');
+        const msg = document.getElementById('event-toast-msg');
+        msg.textContent = message;
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.opacity = 1; }, 10);
+        setTimeout(() => {
+            toast.style.opacity = 0;
+            setTimeout(() => { toast.style.display = 'none'; }, 400);
+        }, duration);
+    }
+
+    function showWhoGoesFirst(name, callback) {
+        const modal = document.getElementById("who-goes-first-modal");
+        const text = document.getElementById("who-goes-first-text");
+        text.textContent = `${name} Goes First!`;
+        modal.classList.remove("hidden");
+        // Restart animation
+        const content = document.getElementById("who-goes-first-content");
+        content.style.animation = "none";
+        void content.offsetWidth;
+        content.style.animation = "";
+        setTimeout(() => {
+            modal.classList.add("hidden");
+            if (callback) callback();
+        }, 1700);
+    }
+
+    function showMeme(callback) {
+        const modal = document.getElementById("meme-modal");
+        modal.classList.remove("hidden");
+        setTimeout(() => {
+            modal.classList.add("hidden");
+            if (callback) callback();
+        }, 1700);
+    }
+
+    function startDraftMode() {
+        // Show draft modal
+        document.getElementById('draft-modal').classList.remove('hidden');
+        // Initialize draft state
+        const allPokemon = Object.keys(MAX_HEALTH).slice(0, 17);
+        let draftPool = [...allPokemon];
+        let teams = { Player1: [], Player2: [] };
+        let turn = 0; // even = Player1, odd = Player2
+        updateDraftUI();
+
+        function updateDraftUI() {
+            document.getElementById('draft-turn').textContent = turn % 2 === 0 ? 'Player 1' : 'Player 2';
+            const poolDiv = document.getElementById('draft-pool');
+            poolDiv.innerHTML = '';
+            draftPool.forEach(pokemon => {
+                const btn = document.createElement('button');
+                btn.className = 'pokemon-btn';
+                btn.textContent = pokemon;
+                btn.onclick = function() {
+                    if (teams.Player1.length < 3 || teams.Player2.length < 3) {
+                        if (turn % 2 === 0) {
+                            teams.Player1.push(pokemon);
+                        } else {
+                            teams.Player2.push(pokemon);
+                        }
+                        draftPool = draftPool.filter(p => p !== pokemon);
+                        turn++;
+                        updateDraftUI();
+                        // End draft if both have 3
+                        if (teams.Player1.length === 3 && teams.Player2.length === 3) {
+                            setTimeout(() => {
+                                document.getElementById('draft-modal').classList.add('hidden');
+                                start3v3Battle(teams);
+                            }, 500);
+                        }
+                    }
+                };
+                btn.disabled = (teams.Player1.includes(pokemon) || teams.Player2.includes(pokemon));
+                poolDiv.appendChild(btn);
+            });
+            // Show teams
+            document.getElementById('draft-teams').innerHTML = `<b>Player 1:</b> ${teams.Player1.join(', ')}<br><b>Player 2:</b> ${teams.Player2.join(', ')}`;
+        }
+        document.getElementById('draft-cancel').onclick = function() {
+            hideModal('draft-modal');
+            document.getElementById('homepage').classList.remove('hidden');
+        };
+    }
+    function start3v3Battle(teams) {
+        // Hide homepage, show battle UI
+        document.getElementById('homepage').classList.add('hidden');
+        document.getElementById('game-container').classList.remove('hidden');
+        // Set up game state for 3v3
+        gameState.mode = '3v3';
+        gameState.teams = teams;
+        gameState.active = { Player1: 0, Player2: 0 };
+        gameState.player = create3v3Player('Player 1', teams.Player1, 'player');
+        gameState.opponent = create3v3Player('Player 2', teams.Player2, 'opponent');
+        gameState.playerStatus = { value: null };
+        gameState.opponentStatus = { value: null };
+        update3v3Avatars();
+        update3v3HealthBars();
+        logMessage('3v3 Battle Start! Player 1: ' + teams.Player1.join(', ') + ' | Player 2: ' + teams.Player2.join(', '));
+        showVsCutscene(gameState.player.name, gameState.opponent.name, () => {
+            start3v3Turn('player');
+        });
+    }
+
+    function create3v3Player(playerName, team, type) {
+        // Returns a player object for the current active Pokémon
+        const idx = type === 'player' ? gameState.active.Player1 : gameState.active.Player2;
+        let name = team[idx];
+        
+        // Create player object with proper initialization
+        const player = new Player(name);
+        
+        // Initialize energy for the new player
+        player.energy = 0;
+        
+        // If Tag Team, start as Maya
+        if (name === "Tag Team Jillian and Maya") {
+            player.name = "Maya";
+            player.maxHp = MAX_HEALTH["Maya"];
+            player.hp = MAX_HEALTH["Maya"];
+            player.speed = SPEED["Maya"];
+            player.moves = POKEMON_MOVES["Maya"];
+        } else {
+            // Initialize other stats for non-Tag Team Pokémon
+            player.maxHp = MAX_HEALTH[name];
+            player.hp = MAX_HEALTH[name];
+            player.speed = SPEED[name];
+            player.moves = POKEMON_MOVES[name];
+        }
+        
+        // Initialize currentPokemon property
+        player.currentPokemon = {
+            id: idx,
+            name: player.name,
+            health: player.hp,
+            energy: player.energy,
+            status: "normal"
+        };
+        
+        // Initialize draftedTeam with all team members
+        player.draftedTeam = [];
+        for (let i = 0; i < team.length; i++) {
+            const pokemonName = team[i];
+            player.draftedTeam.push({
+                id: i,
+                name: pokemonName,
+                health: MAX_HEALTH[pokemonName],
+                energy: 0,
+                status: "normal"
+            });
+        }
+        
+        return player;
+    }
+
+    function update3v3Avatars() {
+        // Update avatars for current Pokémon
+        // Use the actual .name property, not the team array value!
+        document.getElementById('player-avatar').src = POKEMON_ICONS[gameState.player.name];
+        document.getElementById('player-name').textContent = gameState.player.name;
+        document.getElementById('opponent-avatar').src = POKEMON_ICONS[gameState.opponent.name];
+        document.getElementById('opponent-name').textContent = gameState.opponent.name;
+        update3v3TeamBoxes();
+    }
+
+    function update3v3HealthBars() {
+        document.getElementById('player-hp').textContent = `${gameState.player.hp}/${gameState.player.maxHp}`;
+        document.getElementById('opponent-hp').textContent = `${gameState.opponent.hp}/${gameState.opponent.maxHp}`;
+        document.getElementById('player-health-bar').style.width = `${100 * gameState.player.hp / gameState.player.maxHp}%`;
+        document.getElementById('opponent-health-bar').style.width = `${100 * gameState.opponent.hp / gameState.opponent.maxHp}%`;
+        update3v3TeamBoxes();
+    }
+
+    function update3v3TeamBoxes() {
+        if (gameState.mode === '3v3') {
+            // Show boxes
+            document.getElementById('player-team-box').style.display = '';
+            document.getElementById('opponent-team-box').style.display = '';
+            // Player 1
+            let html = '<b>Team:</b><br>';
+            gameState.teams.Player1.forEach((poke, i) => {
+                if (i === gameState.active.Player1) {
+                    // Show active as Maya or Jillian if needed
+                    let displayName = poke;
+                    if (poke === "Tag Team Jillian and Maya") {
+                        displayName = gameState.player.name;
+                    }
+                    html += `<span style="color:#3b4cca;font-weight:bold;">${displayName} (Active)</span><br>`;
+                } else {
+                    html += `<span style="color:#888;">${poke}</span><br>`;
+                }
+            });
+            document.getElementById('player-team-box').innerHTML = html;
+            // Player 2
+            html = '<b>Team:</b><br>';
+            gameState.teams.Player2.forEach((poke, i) => {
+                if (i === gameState.active.Player2) {
+                    let displayName = poke;
+                    if (poke === "Tag Team Jillian and Maya") {
+                        displayName = gameState.opponent.name;
+                    }
+                    html += `<span style="color:#d7263d;font-weight:bold;">${displayName} (Active)</span><br>`;
+                } else {
+                    html += `<span style="color:#888;">${poke}</span><br>`;
+                }
+            });
+            document.getElementById('opponent-team-box').innerHTML = html;
+        } else {
+            document.getElementById('player-team-box').style.display = 'none';
+            document.getElementById('opponent-team-box').style.display = 'none';
+        }
+    }
+
+    function start3v3Turn(current) {
+        update3v3Avatars();
+        update3v3HealthBars();
+        if (current === 'player') {
+            showMoves(gameState.player, async (move) => {
+                await gameState.player.applyMove(move, gameState.opponent, gameState.opponentStatus, gameState.playerStatus);
+                update3v3HealthBars();
+    
+                // FIRST: Check if the player fainted due to self-damage
+                if (gameState.player.hp <= 0) {
+                    await handle3v3Faint('player');
+                    return;
+                }
+                // THEN: Check if the opponent fainted
+                if (gameState.opponent.hp <= 0) {
+                    await handle3v3Faint('opponent');
+                    return;
+                }
+                start3v3Turn('opponent');
+            });
+        } else {
+            showMoves(gameState.opponent, async (move) => {
+                await gameState.opponent.applyMove(move, gameState.player, gameState.playerStatus, gameState.opponentStatus);
+                update3v3HealthBars();
+    
+                // FIRST: Check if the opponent fainted due to self-damage
+                if (gameState.opponent.hp <= 0) {
+                    await handle3v3Faint('opponent');
+                    return;
+                }
+                // THEN: Check if the player fainted
+                if (gameState.player.hp <= 0) {
+                    await handle3v3Faint('player');
+                    return;
+                }
+                start3v3Turn('player');
+            });
+        }
+    }
+
+    async function handle3v3Faint(fainted) {
+        if (fainted === 'player') {
+            const idx = gameState.active.Player1;
+            const team = gameState.teams.Player1;
+            // If Maya faints and this slot is Tag Team, swap to Jillian
+            if (gameState.player.name === "Maya" && team[idx] === "Tag Team Jillian and Maya") {
+                gameState.player = new Player("Jillian");
+                gameState.player.energy = 0; // Reset energy for the next Pokémon
+                updateEnergyDisplay(); // Update UI
+                logMessage("Jillian Spawned from the Tag Team 🤝");
+                update3v3Avatars();
+                update3v3HealthBars();
+                start3v3Turn('opponent');
+                return;
+            }
+            // Otherwise, go to next Pokémon
+            gameState.active.Player1++;
+            gameState.player.energy = 0; // Reset energy for the next Pokémon
+            updateEnergyDisplay(); // Update UI
+            if (gameState.active.Player1 >= 3) {
+                showPlayAgainModal('All of Player 1\'s Pokémon have fainted! Player 2 wins! 🏆');
+                return;
+            } else {
+                logMessage(`Player 1 sends out ${team[gameState.active.Player1]}!`);
+                gameState.player = create3v3Player('Player 1', team, 'player');
+                update3v3Avatars();
+                update3v3HealthBars();
+                start3v3Turn('opponent');
+            }
+        } else {
+            const idx = gameState.active.Player2;
+            const team = gameState.teams.Player2;
+            // If Maya faints and this slot is Tag Team, swap to Jillian
+            if (gameState.opponent.name === "Maya" && team[idx] === "Tag Team Jillian and Maya") {
+                gameState.opponent = new Player("Jillian");
+                gameState.opponent.energy = 0; // Reset energy for the next Pokémon
+                updateEnergyDisplay(); // Update UI
+                logMessage("Jillian Spawned from the Tag Team 🤝");
+                update3v3Avatars();
+                update3v3HealthBars();
+                start3v3Turn('player');
+                return;
+            }
+            // Otherwise, go to next Pokémon
+            gameState.active.Player2++;
+            gameState.opponent.energy = 0; // Reset energy for the next Pokémon
+            updateEnergyDisplay(); // Update UI
+            if (gameState.active.Player2 >= 3) {
+                showPlayAgainModal('All of Player 2\'s Pokémon have fainted! Player 1 wins! 🏆');
+                return;
+            } else {
+                logMessage(`Player 2 sends out ${team[gameState.active.Player2]}!`);
+                gameState.opponent = create3v3Player('Player 2', team, 'opponent');
+                update3v3Avatars();
+                update3v3HealthBars();
+                start3v3Turn('player');
+            }
+        }
+    }
+        
+});
+// JS for loading screen
+window.addEventListener('DOMContentLoaded', function() {
+    const loadingScreen = document.getElementById('loading-screen');
+    loadingScreen.addEventListener('click', function() {
+        loadingScreen.style.opacity = '0';
+        setTimeout(() => {
+            loadingScreen.style.display = 'none';
+        }, 400);
+    });
+});
+</script>
+    <!-- MEME MODAL -->
+    <div id="meme-modal" class="hidden" style="position:fixed;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.82);z-index:4000;">
+      <img id="meme-img" src="https://media.makeameme.org/created/what-da-hail-5f939d0360.jpg" alt="Meme Beam" style="max-width:90vw;max-height:80vh;border-radius:22px;box-shadow:0 2px 32px #3b4cca80;">
+    </div>
+</body>
+</html>
